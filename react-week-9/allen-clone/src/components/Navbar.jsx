@@ -1,9 +1,11 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import {PhoneCall} from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 
 function Navbar() {
+    const navigate = useNavigate()
   return (
     <>
     <div className=''>
@@ -41,9 +43,9 @@ function Navbar() {
                         <div className='text-sm font-medium'>Talk to us</div>
                     </button>
                 </Link>
-                <Link to="/login">
+                <a href='http://google.com' target='_blank'>
                     <button className='pl-4 pr-4 pt-2 pb-2 box-border border-2 border-blue-600 rounded-full hover:bg-gray-300 text-sm font-medium'>Login</button>
-                </Link>
+                </a>
             </div>
         </div>
 
