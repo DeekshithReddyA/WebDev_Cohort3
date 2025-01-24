@@ -29,9 +29,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
             </div>
           </div>
         </div>
-        <div className='ml-6 h-9 w-10'>
-
-         <img className='rounded rounded-full size-fit' src='https://appx-wsb-gcp.akamai.net.in/subject/2023-01-17-0.17044360120951185.jpg' />
+        <div className='md:ml-6 md:h-10 md:w-10 ml-3 h-9 w-10'>
+         <img className='rounded rounded-full ' src='https://appx-wsb-gcp.akamai.net.in/subject/2023-01-17-0.17044360120951185.jpg' />
         </div>
       </div>
       <div className='mt-12 mr-4 ml-2 group cursor-pointer'>
