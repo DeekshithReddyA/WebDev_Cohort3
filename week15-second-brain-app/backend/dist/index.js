@@ -17,6 +17,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const db_1 = require("./db");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const middleware_1 = require("./middleware");
 dotenv_1.default.config();
 const saltRounds = 5;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -64,6 +65,29 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
     catch (err) {
         res.status(500).json({ message: "Server Error" });
+    }
+}));
+app.post("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const link = req.body.link;
+    const type = req.body.type;
+    const title = req.body.title;
+    yield db_1.ContentModel.create({
+        link,
+        title,
+        type,
+        userId: req.userId,
+        tags: []
+    });
+    res.json({ message: "Content Added" });
+}));
+app.get("/api/v1/contents", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const contents = yield db_1.ContentModel.find({ userId: req.userId })
+            .populate("userId", "username");
+        res.status(200).json({ contents });
+    }
+    catch (err) {
+        res.status(400).json({ message: "Server Error" });
     }
 }));
 const PORT = 3000;

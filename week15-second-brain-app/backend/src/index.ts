@@ -1,6 +1,6 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-import { UserModel } from './db';
+import { ContentModel, UserModel } from './db';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { userMiddleware } from './middleware';
@@ -63,11 +63,57 @@ app.post("/api/v1/signin" , async(req, res) => {
     }
 })
 
-app.post("/api/v1/content", userMiddleware , (req, res) => {
+app.post("/api/v1/content", userMiddleware , async (req, res) => {
     const link = req.body.link;
     const type = req.body.type;
-    
+    const title = req.body.title;
+
+    await ContentModel.create({
+        link,
+        title,
+        type,
+        userId : req.userId,
+        tags: []
+    })
+
+    res.json({message : "Content Added"});
 });
+
+
+app.get("/api/v1/contents" , userMiddleware, async(req, res) => {
+    try{
+        const contents = await ContentModel.find({userId : req.userId})
+                                           .populate("userId" , "username");
+        res.status(200).json({contents});        
+    } catch(err){
+        res.status(400).json({message : "Server Error"})
+    }
+})
+
+
+app.delete("/api/v1/content" , userMiddleware , async(req, res) =>{
+    try{
+        const contents = await ContentModel.findOneAndDelete({userId: req.userId , 
+            _id : req.body.contentId
+        });
+        if(contents){
+            res.status(200).json({message: "Deleted Successfully"});
+        } else{
+            res.status(403).json({message: "Trying to delete a doc you don't own"})
+        }
+    } catch(err){
+        res.status(500).json({message : "Server Error" , error : err});
+    }
+});
+
+
+app.post("/api/v1/brain/share" , userMiddleware  ,async(req, res) =>{
+
+});
+
+app.get("/api/v1/brain/:shareLink", userMiddleware , async(req, res) => {
+    
+})
 
 const PORT=3000
 app.listen(PORT , () => {
