@@ -18,6 +18,7 @@ const db_1 = require("./db");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const middleware_1 = require("./middleware");
+const crypto_1 = __importDefault(require("crypto"));
 dotenv_1.default.config();
 const saltRounds = 5;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -88,6 +89,69 @@ app.get("/api/v1/contents", middleware_1.userMiddleware, (req, res) => __awaiter
     }
     catch (err) {
         res.status(400).json({ message: "Server Error" });
+    }
+}));
+app.delete("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const contents = yield db_1.ContentModel.findOneAndDelete({
+            userId: req.userId,
+            _id: req.body.contentId
+        });
+        if (contents) {
+            res.status(200).json({ message: "Deleted Successfully" });
+        }
+        else {
+            res.status(403).json({ message: "Trying to delete a doc you don't own" });
+        }
+    }
+    catch (err) {
+        res.status(500).json({ message: "Server Error", error: err });
+    }
+}));
+app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const share = req.body.share;
+    const userId = req.userId;
+    try {
+        if (share) {
+            const shareToken = crypto_1.default.randomBytes(8).toString('hex');
+            yield db_1.LinkModel.findOneAndUpdate({ userId: userId }, { link: shareToken,
+                userId: userId
+            }, { upsert: true, new: true, runValidators: true });
+            res.status(200).json({
+                link: `${req.protocol}://${req.get('host')}/api/v1/brain/${shareToken}`
+            });
+        }
+        else {
+            yield db_1.LinkModel.findOneAndDelete({ userId: userId });
+            res.status(201).json({ message: "The content is now private" });
+        }
+    }
+    catch (err) {
+        res.status(500).json({ message: "Server Error", error: err });
+    }
+}));
+app.get("/api/v1/brain/:shareLink", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const shareToken = req.params.shareLink;
+    try {
+        const linkExists = yield db_1.LinkModel.findOne({ link: shareToken });
+        if (linkExists) {
+            const userData = yield db_1.UserModel.findById({ _id: linkExists.userId }, { _id: 0, __V: 0, password: 0 });
+            const content = yield db_1.ContentModel.find({ userId: linkExists.userId }, { userId: 0 });
+            if (userData) {
+                res.status(200).json({ username: userData.username,
+                    content: content
+                });
+            }
+            else {
+                res.status(404).json({ message: "User doesn't exist" });
+            }
+        }
+        else {
+            res.status(404).json({ message: "The user has disabled sharing or invalid link" });
+        }
+    }
+    catch (err) {
+        res.status(500).json({ message: "Server Error", error: err });
     }
 }));
 const PORT = 3000;
