@@ -1,15 +1,10 @@
-import { Button } from '../ui/Button'
-import { PlusIcon } from '../icons/PlusIcon'
-import { ShareIcon } from '../icons/ShareIcon'
-import { Card } from '../ui/Card'
-import { CreateContentModal } from '../ui/CreateContentModal'
-import { useState } from 'react'
+
 import { Sidebar } from '../ui/Sidebar'
 import { Navbar } from '../ui/Navbar'
+import { Card } from '../ui/Card'
 
 export function Dashboard() {
 
-  const [createContentModalOpen , setCreateContentModalOpen] = useState(false);
   return (
     <div className=''>
         <Navbar />
