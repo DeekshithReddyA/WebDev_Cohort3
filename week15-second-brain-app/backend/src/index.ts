@@ -162,7 +162,7 @@ app.get("/api/v1/brain/:shareLink", async (req, res) => {
     }
 })
 
-const PORT = 3000
+const PORT = 300de 0
 app.listen(PORT, () => {
     console.log("Server running on port ", PORT);
 })
