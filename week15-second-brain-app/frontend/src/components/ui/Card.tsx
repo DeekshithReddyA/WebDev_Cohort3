@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ShareIcon } from "../icons/ShareIcon";
 import { TrashIcon } from "../icons/TrashIcon";
 import { TwitterTweetEmbed } from "react-twitter-embed";
