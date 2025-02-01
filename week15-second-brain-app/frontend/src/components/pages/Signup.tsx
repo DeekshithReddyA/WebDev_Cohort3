@@ -11,11 +11,11 @@ export const Signup = () => {
     const navigate = useNavigate();
     return(
         <div className="min-h-screen translation-colors bg-gradient-to-br from-purple-500 to-pink-500 flex justify-center items-center">
-            <div className="p-4 bg-white flex flex-col justify-center items-center rounded-lg shadow-lg">
+            <div className="p-4 bg-white flex flex-col justify-center items-center rounded-lg shadow-lg dark:bg-black">
                 <div className="m-2">
                         <img className="w-48"src="https://media-hosting.imagekit.io//8b468e186a09429e/secondbrain.png?Expires=1833046694&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=W8yQtX9RHx2qQJcvrn6OpADulEvSG4xacm4m-Ag8UnLcfbrOs4scFz3zgCjLVE57iYGuw0-ZHBdQsXglsql~6c8EBtbha2NOWSFKg0VGvWURtdFQCKUxy-muz75yHy~2Le3Mv65ldvk98N07fFbycbEqT4lYJU6e0AiVfriygbciSVoAY8Fwnzi50kYe1JjcIB3O1VZSTIfjhHVtGXHffdnZtiSOc-IHe7o14Z5PIvK0txbOVMtk5v6m8bGs4RVObDhzSbqsaowBininsrwmJZZh2rt64FlacUAJvMK21ofBmNHkjXUeb99SqBXLAm6W4jsr9GIpE9lvrY5BlL-FzQ__" />
                 </div>
-                <div className="mt-6 mb-3 text-lg font-medium">
+                <div className="mt-6 mb-3 text-lg font-medium dark:text-white">
                     Create an Account
                 </div>
                 <div className="m-2">
