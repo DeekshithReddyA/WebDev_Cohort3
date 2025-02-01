@@ -12,7 +12,10 @@ export default {
           1100 : "#bc2ff0",
           1000 : "#d498f3"
         }
-      }
+      },
+      // fontFamily:{
+      //   sans: ['ui-sans-serif', 'system-ui', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji']
+      // }
     },
   },
   plugins: [],

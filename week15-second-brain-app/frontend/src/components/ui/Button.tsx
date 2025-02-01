@@ -5,6 +5,7 @@ export interface ButtonProps{
     size : "sm" | "md" | "lg";
     text: string;
     startIcon ?: ReactElement;
+    endIcon?: ReactElement;
     onClick: () => void;
 }
 const defaultStyles = "rounded-lg";
@@ -14,7 +15,7 @@ const variantStyles = {
 }
     
 const sizeStyles = {
-    "sm" : "py-1.5 px-2 text-sm",
+    "sm" : "py-1.5 px-2 text-base",
     "md" : "py-2 px-3 text-lg",
     "lg" : "py-3 px-4 text-2xl"
 }
@@ -27,7 +28,12 @@ export const Button = (props: ButtonProps) => {
             <div className="pr-1">
             {props.startIcon}
             </div>
-            {props.text}
+            <div className="flex items-center justify-center">
+                <div className="font-medium">
+                    {props.text}
+                </div>
+                {props.endIcon}
+            </div>
         </div>
         </button>
 }

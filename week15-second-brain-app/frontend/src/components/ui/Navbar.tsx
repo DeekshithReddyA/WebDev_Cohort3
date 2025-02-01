@@ -12,7 +12,7 @@ export const Navbar = () => {
                 <div className="text-purple-1200 md:px-2 px-1">
                     <BrainIcon />
                 </div>
-                <div className="md:text-2xl md:font-medium text-md font-medium">Second Brain</div>
+                <div className="md:text-2xl md:font-medium text-lg font-medium">Second Brain</div>
             </div>
             <div className="md:flex hidden">
                 <Input icon={<SearchIcon size="sm"/>} placeholder="Search" onChange={() => { }} />
