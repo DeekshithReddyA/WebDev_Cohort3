@@ -29,7 +29,7 @@ export const Card = (props: CardProps) => {
         "sm": props.type === "tweet" || "youtube" ? "max-w-72 min-h-64" : "max-w-48 min-h-48"
     }
     const [hover , setHover] = useState(false);
-    return <div>
+    return <div className="relative">
         <div className={`${sizeStyles[props.size]} ${defaultStyles} ${hoverStyles} ${hover ? "bg-gradient-to-br from-transparent to-purple-1000/20" : "bg-white"}`} onMouseOver={() => {setHover(true)}} onMouseLeave={() => setHover(false)}>
             <div className="flex p-3 items-center justify-between">
                 <div className="flex items-center">
