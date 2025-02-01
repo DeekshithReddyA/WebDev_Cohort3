@@ -1,4 +1,4 @@
-import { useState , useEffect} from "react";
+import { useState, useEffect } from "react";
 import { ShareIcon } from "../icons/ShareIcon";
 import { TrashIcon } from "../icons/TrashIcon";
 import { TwitterTweetEmbed } from "react-twitter-embed";
@@ -19,11 +19,11 @@ const hoverStyles = "hover:cursor-pointer hover:scale-[1.02] duration-300 hover:
 
 export const Card = (props: CardProps) => {
     
-useEffect(() => {
-  if (props.type === "tweet" && typeof window !== "undefined" && window.twttr) {
-    window.twttr.widgets.load();
-  }
-}, [props.link, props.type]);
+    useEffect(() => {
+        if (props.type === "tweet" && typeof window !== "undefined" && window.twttr) {
+        window.twttr.widgets.load();
+        }
+    }, [props.link, props.type]);
 
     const sizeStyles = {
         "md": props.type === "tweet" || "youtube" ? "max-w-72 min-h-64" : "max-w-64 min-h-64",
@@ -55,7 +55,11 @@ useEffect(() => {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                         referrerPolicy="strict-origin-when-cross-origin" allowFullScreen>
                 </iframe>}
-                {props.type === "tweet" && <TwitterTweetEmbed tweetId={props.link.split("status/")[1]} />}
+                {props.type === "tweet" && <blockquote className="twitter-tweet w-full max-w-full"
+                        >
+                    <a href={props.link.replace("x.com" , "twitter.com")}
+                    ></a>
+                </blockquote>}
             </div>
         </div>
     </div>
