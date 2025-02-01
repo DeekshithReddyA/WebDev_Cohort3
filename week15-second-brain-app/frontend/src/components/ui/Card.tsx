@@ -19,11 +19,6 @@ const hoverStyles = "hover:cursor-pointer hover:scale-[1.02] duration-300 hover:
 
 export const Card = (props: CardProps) => {
     
-    useEffect(() => {
-        if (props.type === "tweet" && twttr) {
-            twttr.widgets.load();
-        }
-    }, [props.link, props.type]);
 
     const sizeStyles = {
         "md": props.type === "tweet" || "youtube" ? "max-w-72 min-h-64" : "max-w-64 min-h-64",
