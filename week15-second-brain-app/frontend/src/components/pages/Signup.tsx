@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom"
 import { ArrowRight } from "../icons/Arrows"
 import { LockIcon } from "../icons/LockIcon"
 import { MailIcon } from "../icons/MailIcon"
@@ -5,7 +6,9 @@ import { UserIcon } from "../icons/UserIcon"
 import { Button } from "../ui/Button"
 import { Input } from "../ui/Input"
 
+
 export const Signup = () => {
+    const navigate = useNavigate();
     return(
         <div className="min-h-screen translation-colors bg-gradient-to-br from-purple-500 to-pink-500 flex justify-center items-center">
             <div className="p-4 bg-white flex flex-col justify-center items-center rounded-lg shadow-lg">
@@ -28,13 +31,18 @@ export const Signup = () => {
                     <Input type="password" icon={<LockIcon size="sm"/>} placeholder="********"/>
                 </div>
                 <div className="m-4">
-                    <Button variant="primary" size="sm" text="Sign Up " endIcon={<ArrowRight size="sm" />} onClick={() => {}}/>
+                    <Button variant="primary" size="sm" text="Sign Up " endIcon={<ArrowRight size="sm" />} onClick={() => {
+                        navigate('/dashboard');
+                    }}/>
                 </div>
                 <div className="flex mt-2">
                     <div className="text-gray-500 text-sm pr-1">
                         Already have an account? 
                     </div>
-                    <div className="text-purple-1100 text-sm underline cursor-pointer hover:text-purple-1200" onClick={() => {}}>
+                    <div className="text-purple-1100 text-sm underline cursor-pointer hover:text-purple-1200" onClick={(e) => {
+                        e.preventDefault();
+                        navigate('/')
+                    }}>
                         Sign in
                     </div>
                 </div>
