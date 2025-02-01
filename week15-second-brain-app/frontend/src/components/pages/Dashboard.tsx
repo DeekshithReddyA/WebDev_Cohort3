@@ -6,7 +6,7 @@ import { Card } from '../ui/Card'
 export function Dashboard() {
 
   return (
-    <div className=''>
+    <div className='dark:bg-black'>
       <div className='pt-16'>
         <Sidebar/>
       </div>

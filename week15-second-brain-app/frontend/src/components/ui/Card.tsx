@@ -30,18 +30,18 @@ export const Card = (props: CardProps) => {
     }
     const [hover , setHover] = useState(false);
     return <div className="relative">
-        <div className={`${sizeStyles[props.size]} ${defaultStyles} ${hoverStyles} ${hover ? "bg-gradient-to-br from-transparent to-purple-1000/20" : "bg-white"}`} onMouseOver={() => {setHover(true)}} onMouseLeave={() => setHover(false)}>
+        <div className={`${sizeStyles[props.size]} ${defaultStyles} ${hoverStyles} ${hover ? "bg-gradient-to-br from-transparent to-purple-1000/10 dark:from-gray-900 dark:to-purple-1200/40" : "bg-white dark:bg-black"}`} onMouseOver={() => {setHover(true)}} onMouseLeave={() => setHover(false)}>
             <div className="flex p-3 items-center justify-between">
                 <div className="flex items-center">
-                    <div className={`pr-6 `}>
+                    <div className={`pr-6 dark:text-white`}>
                         <ShareIcon size="sm" />
                     </div>
-                    <div className={`font-medium ${hover ? "text-purple-1200" : ""}`}>
+                    <div className={`font-medium ${hover ? "text-purple-1200" : "dark:text-white"}`}>
                         {props.title}
                     </div>
                 </div>
                 <div className="flex items-center">
-                    <div className={`hover:text-red-900 ${hoverStyles} text-gray-500`}>
+                    <div className={`hover:text-red-700 ${hoverStyles} text-gray-500`}>
                         <TrashIcon size="sm" />
                     </div>
                 </div>
@@ -54,7 +54,7 @@ export const Card = (props: CardProps) => {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                         referrerPolicy="strict-origin-when-cross-origin" allowFullScreen>
                 </iframe>}
-                {props.type === "tweet" && <blockquote className="twitter-tweet w-full max-w-full"
+                {props.type === "tweet" && <blockquote className="twitter-tweet w-full max-w-full" data-theme="dark"
                         >
                     <a href={props.link.replace("x.com" , "twitter.com")}
                     ></a>
