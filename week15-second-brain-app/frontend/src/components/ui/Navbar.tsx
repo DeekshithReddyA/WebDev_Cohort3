@@ -4,7 +4,7 @@ import { ShareIcon } from "../icons/ShareIcon"
 import { Button } from "./Button"
 import { Input } from "./Input"
 
-export const Navbar = () => {
+export const Navbar = ({setModalOpen}:any) => {
     return (
         <div className="min-h-16 min-w-screen bg-slate-200 dark:bg-gray-900 flex items-center justify-between fixed top-0 right-0 left-0">
             <div className="ml-2 flex items-center">
@@ -18,7 +18,7 @@ export const Navbar = () => {
                     <Button startIcon={<ShareIcon size='sm' />} variant='secondary' size='sm' text='Share Brain' onClick={() => { }} />
                 </div>
                 <div className="md:mr-4 mr-2">
-                    <Button startIcon={<PlusIcon size='sm' />} variant='primary' size='sm' text='Add Content' onClick={() => { }} />
+                    <Button startIcon={<PlusIcon size='sm' />} variant='primary' size='sm' text='Add Content' onClick={() => {setModalOpen(true)}} />
                 </div>
             </div>
         </div>
