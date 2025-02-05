@@ -19,19 +19,25 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const middleware_1 = require("./middleware");
 const crypto_1 = __importDefault(require("crypto"));
+const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const saltRounds = 5;
 const JWT_SECRET = process.env.JWT_SECRET;
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+app.use((0, cors_1.default)());
 app.post("/api/v1/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.body.username;
     const password = req.body.password;
+    if (username === "" || password === "") {
+        res.status(201).json({ message: "Enter all details" });
+        return;
+    }
     const hashPassword = yield bcrypt_1.default.hash(password, saltRounds);
     try {
         const exisitingUser = yield db_1.UserModel.findOne({ username });
         if (exisitingUser) {
-            res.status(403).json({ message: "User already exisits with this username" });
+            res.status(203).json({ message: "User already exisits with this username" });
         }
         else {
             yield db_1.UserModel.create({ username, password: hashPassword });
@@ -57,11 +63,11 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
                 res.status(200).json({ token });
             }
             else {
-                res.status(403).json({ message: "Wrong credentials" });
+                res.status(203).json({ message: "Wrong credentials" });
             }
         }
         else {
-            res.status(404).json({ message: "Wrong credentials" });
+            res.status(203).json({ message: "User with this username doesn't exist" });
         }
     }
     catch (err) {
@@ -114,7 +120,7 @@ app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awa
     try {
         if (share) {
             const shareToken = crypto_1.default.randomBytes(8).toString('hex');
-            yield db_1.LinkModel.findOneAndUpdate({ userId: userId }, { link: shareToken,
+            yield db_1.LinkModel.updateOne({ userId: userId }, { link: shareToken,
                 userId: userId
             }, { upsert: true, new: true, runValidators: true });
             res.status(200).json({
@@ -122,7 +128,7 @@ app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awa
             });
         }
         else {
-            yield db_1.LinkModel.findOneAndDelete({ userId: userId });
+            yield db_1.LinkModel.deleteOne({ userId: userId });
             res.status(201).json({ message: "The content is now private" });
         }
     }
@@ -154,7 +160,7 @@ app.get("/api/v1/brain/:shareLink", (req, res) => __awaiter(void 0, void 0, void
         res.status(500).json({ message: "Server Error", error: err });
     }
 }));
-const PORT = 3000;
+const PORT = 4000;
 app.listen(PORT, () => {
     console.log("Server running on port ", PORT);
 });

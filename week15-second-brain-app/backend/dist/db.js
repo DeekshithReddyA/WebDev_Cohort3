@@ -41,7 +41,7 @@ const mongoose_1 = __importStar(require("mongoose"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const mongoURI = process.env.MONGO_URI;
-mongoose_1.default.connect(mongoURI);
+mongoose_1.default.connect(mongoURI).then(() => console.log("Connected to MongoDB"));
 const UserSchema = new mongoose_1.Schema({
     username: { type: String, unique: true },
     password: String

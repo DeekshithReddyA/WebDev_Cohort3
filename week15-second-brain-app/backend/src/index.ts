@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { userMiddleware } from './middleware';
 import crypto from 'crypto';
 import { ObjectId } from 'mongoose';
+import cors from 'cors';
 
 
 dotenv.config();
@@ -16,17 +17,23 @@ const JWT_SECRET: any = process.env.JWT_SECRET
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.post("/api/v1/signup", async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
+
+    if(username === "" || password === ""){
+        res.status(201).json({message : "Enter all details"});
+        return;
+    }
 
     const hashPassword = await bcrypt.hash(password, saltRounds);
 
     try {
         const exisitingUser = await UserModel.findOne({ username });
         if (exisitingUser) {
-            res.status(403).json({ message: "User already exisits with this username" });
+            res.status(203).json({ message: "User already exisits with this username" });
         } else {
             await UserModel.create({ username, password: hashPassword });
             res.status(200).json({ message: "User signed up" })
@@ -54,11 +61,11 @@ app.post("/api/v1/signin", async (req, res) => {
                 }, JWT_SECRET);
                 res.status(200).json({ token });
             } else {
-                res.status(403).json({ message: "Wrong credentials" });
+                res.status(203).json({ message: "Wrong credentials" });
             }
 
         } else {
-            res.status(404).json({ message: "Wrong credentials" });
+            res.status(203).json({ message: "User with this username doesn't exist" });
         }
     } catch (err) {
         res.status(500).json({ message: "Server Error" });
@@ -162,7 +169,7 @@ app.get("/api/v1/brain/:shareLink", async (req, res) => {
     }
 })
 
-const PORT = 300de 0
+const PORT = 4000
 app.listen(PORT, () => {
     console.log("Server running on port ", PORT);
 })

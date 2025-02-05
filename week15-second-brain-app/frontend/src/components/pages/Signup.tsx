@@ -1,14 +1,54 @@
 import { useNavigate } from "react-router-dom"
 import { ArrowRight } from "../icons/Arrows"
 import { LockIcon } from "../icons/LockIcon"
-import { MailIcon } from "../icons/MailIcon"
+// import { MailIcon } from "../icons/MailIcon"
 import { UserIcon } from "../icons/UserIcon"
 import { Button } from "../ui/Button"
 import { Input } from "../ui/Input"
+import { useState } from "react"
+import { BACKEND_URL } from "../../Config"
+import axios from "axios";
 
 
 export const Signup = () => {
     const navigate = useNavigate();
+
+    const [responseMessage , setResponseMessage] = useState("");
+    const [formData, setFormData] = useState<{username: string , password:string}>({
+        username: "",
+        password : ""
+    })
+
+
+    const handleChange = (e: any) => {
+        const {name , value} = e.target;
+        
+        setFormData({
+            ...formData ,
+            [name] : value
+        })
+    }
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault(); // Prevent page refresh
+        signup();
+    };
+
+    const signup = async () => {
+
+
+        const response = await axios.post(`${BACKEND_URL}/api/v1/signup`,formData);
+        if(response.status === 200){
+            setFormData({
+                username : "",
+                password: ""
+            })
+            navigate('/dashboard');
+        } else{
+            setResponseMessage(response.data.message);
+        }
+        
+    }
+
     return(
         <div className="min-h-screen translation-colors bg-gradient-to-br from-purple-500 to-pink-500 flex justify-center items-center">
             <div className="p-4 bg-white flex flex-col justify-center items-center rounded-lg shadow-lg dark:bg-black">
@@ -18,23 +58,28 @@ export const Signup = () => {
                 <div className="mt-6 mb-3 text-lg font-medium dark:text-white">
                     Create an Account
                 </div>
-                <div className="m-2">
-                    <label className="pl-1 pb-1">Username</label>
-                    <Input icon={<UserIcon size="sm"/>} placeholder="John Doe"/>
+                <div className="mt-2 text-white">
+                    {responseMessage !== "" && <div className="p-1 bg-red-600/80 rounded text-xs">{responseMessage}!!</div>}
                 </div>
-                <div className="m-2">
-                    <label className="pl-1 pb-1">Email</label>
-                    <Input icon={<MailIcon size="sm"/>} placeholder="abc@example.com"/>
-                </div>
-                <div className="m-2">
-                    <label className="pl-1 pb-1">Password</label>
-                    <Input type="password" icon={<LockIcon size="sm"/>} placeholder="********"/>
-                </div>
-                <div className="m-4">
-                    <Button variant="primary" size="sm" text="Sign Up " endIcon={<ArrowRight size="sm" />} onClick={() => {
-                        navigate('/dashboard');
-                    }}/>
-                </div>
+                <form className="flex flex-col items-center"onSubmit={handleSubmit}>
+                    <div className="mb-2">
+                        <label className="pl-1 pb-1">Username</label>
+                        <Input icon={<UserIcon size="sm"/>} name={"username"} value={formData.username} onChange={handleChange} placeholder="John Doe"/>
+                    </div>
+                    <div className="m-2">
+                        <label className="pl-1 pb-1">Password</label>
+                        <Input type="password" name={"password"} value={formData.password} onChange={handleChange} icon={<LockIcon size="sm"/>} placeholder="********"/>
+                    </div>
+                    <div className="m-4">
+                        <Button 
+                            variant="primary" 
+                            size="sm" 
+                            text="Sign Up " 
+                            endIcon={<ArrowRight size="sm" />}  
+                            type="submit" // Set button type to submit
+                        />
+                    </div>
+                </form>
                 <div className="flex mt-2">
                     <div className="text-gray-500 text-sm pr-1">
                         Already have an account? 

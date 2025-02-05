@@ -2,10 +2,15 @@
 import { Sidebar } from '../ui/Sidebar'
 import { Navbar } from '../ui/Navbar'
 import { Card } from '../ui/Card'
+import { CreateContentModal } from '../ui/CreateContentModal'
+import { useState } from 'react'
 
 export function Dashboard() {
 
+  const [contentModalOpen , setContentModalOpen] = useState<boolean>(true);
+
   return (
+    <div>
     <div className='dark:bg-black'>
       <div className='pt-16'>
         <Sidebar/>
@@ -43,6 +48,8 @@ export function Dashboard() {
           </div>
         </div>
         <Navbar />
+    </div>
+    <CreateContentModal open={contentModalOpen} setOpen={setContentModalOpen}/>
     </div>
   )
 }

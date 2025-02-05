@@ -6,7 +6,8 @@ export interface ButtonProps{
     text: string;
     startIcon ?: ReactElement;
     endIcon?: ReactElement;
-    onClick: () => void;
+    onClick?: () => void;
+    type?: "button" | "submit";
 }
 const defaultStyles = "rounded-lg";
 const variantStyles = {
@@ -23,7 +24,7 @@ const sizeStyles = {
 const hoverStyles = "hover:scale-[1.04] transition-all duration-300 object-contain"
 
 export const Button = (props: ButtonProps) => {
-    return <button onClick={props.onClick} className={`${variantStyles[props.variant]} ${defaultStyles} ${sizeStyles[props.size]} ${hoverStyles}`}>
+    return <button type={props.type || "button"} onClick={props.onClick} className={`${variantStyles[props.variant]} ${defaultStyles} ${sizeStyles[props.size]} ${hoverStyles}`}>
         <div className={`flex items-center`}>
             <div className="pr-1">
             {props.startIcon}
