@@ -30,7 +30,7 @@ export const Card = (props: CardProps) => {
     }
     const [hover , setHover] = useState(false);
     return <div className="relative">
-        <div className={`${sizeStyles[props.size]} ${defaultStyles} ${hoverStyles} ${hover ? "bg-gradient-to-br from-transparent to-purple-1000/10 dark:from-gray-900 dark:to-purple-1200/40" : "bg-white dark:bg-black"}`} onMouseOver={() => {setHover(true)}} onMouseLeave={() => setHover(false)}>
+        <div className={`${sizeStyles[props.size]} ${defaultStyles} ${hoverStyles} ${hover ? "bg-gradient-to-br from-transparent to-purple-1000/10 dark:from-gray-900 dark:to-purple-1200/40" : "bg-white dark:bg-gray-1000"}`} onMouseOver={() => {setHover(true)}} onMouseLeave={() => setHover(false)}>
             <div className="flex p-3 items-center justify-between">
                 <div className="flex items-center">
                     <div className={`pr-6 dark:text-white`}>

@@ -20,15 +20,15 @@ export function Dashboard() {
 
   return (
     <div>
-    <div className='dark:bg-black min-h-screen min-w-screen'>
+    <div className='dark:bg-gray-1100 min-h-screen min-w-screen'>
       <div className='pt-16'>
         <Sidebar/>
       </div>
         {/* <div className='flex ml-15 md:ml-64 mt-4 gap-4 sm:columns-2 md:columns-3 lg-columns-4'>*/}
         <div className='md:ml-64 ml-14 px-2 mt-10'>
           <div className='columns-1 sm:columns-2 md:columns-2 lg:columns-3 xl:columns-4 gap-1'>
-            {contents.map((content: ContentType) => (
-              <div className='break-inside-avoid-column mb-4'>
+            {contents.map((content: ContentType , index) => (
+              <div key={index + 1} className='break-inside-avoid-column mb-4'>
                 <Card size='sm' 
                       title={content.title} 
                       type={content.type} 

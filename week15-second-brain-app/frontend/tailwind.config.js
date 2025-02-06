@@ -11,6 +11,10 @@ export default {
           1200 : "#9e00ec",
           1100 : "#bc2ff0",
           1000 : "#d498f3"
+        },
+        gray:{
+          1000 : "#3b444b",
+          1100 : "#3b3b3b"
         }
       },
       // fontFamily:{

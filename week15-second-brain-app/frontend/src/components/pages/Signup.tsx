@@ -42,7 +42,7 @@ export const Signup = () => {
                 username : "",
                 password: ""
             })
-            navigate('/dashboard');
+            navigate('/');
         } else{
             setResponseMessage(response.data.message);
         }
