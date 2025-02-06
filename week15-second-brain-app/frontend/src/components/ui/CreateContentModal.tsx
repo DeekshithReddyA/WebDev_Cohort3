@@ -7,11 +7,11 @@ import { Link } from "../icons/Link";
 import { Tag } from "../icons/Tag";
 import { BACKEND_URL } from "../../Config";
 import axios from "axios";
-import { useContent } from "../hooks/useContent";
 
 interface CreateContentProps{
     open : boolean ;
     setOpen : any;
+    refresh: any;
 }
 
 type Content = "tweet" | "youtube";
@@ -26,7 +26,6 @@ export const CreateContentModal = (props: CreateContentProps) =>{
 
     const [responseMessage , setResponseMessage] = useState("");
 
-    const {refresh} = useContent();
 
     const [type , setType] = useState<Content>("youtube");
 
@@ -48,13 +47,13 @@ export const CreateContentModal = (props: CreateContentProps) =>{
         );
 
         if (response.status === 200){
-            refresh();
             props.setOpen(false);
+            props.refresh();
         } else{
             setResponseMessage(response.data.message);
         }
     }
-
+    
     const handleSubmit = (e: React.FormEvent) =>{
         e.preventDefault();
         addContent();

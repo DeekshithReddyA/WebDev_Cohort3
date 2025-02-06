@@ -16,7 +16,7 @@ interface ContentType {
 export function Dashboard() {
 
   const [contentModalOpen , setContentModalOpen] = useState<boolean>(false);
-  const {contents} = useContent();
+  const {refresh , contents} = useContent();
 
   return (
     <div>
@@ -40,7 +40,7 @@ export function Dashboard() {
         </div>
         <Navbar setModalOpen={setContentModalOpen}/>
     </div>
-    <CreateContentModal open={contentModalOpen} setOpen={setContentModalOpen}/>
+    <CreateContentModal open={contentModalOpen} setOpen={setContentModalOpen} refresh={refresh}/>
     </div>
   )
 }
