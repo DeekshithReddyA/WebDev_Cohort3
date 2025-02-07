@@ -126,8 +126,10 @@ app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awa
             yield db_1.LinkModel.updateOne({ userId: userId }, { link: shareToken,
                 userId: userId
             }, { upsert: true, new: true, runValidators: true });
+            const host = req.get('X-Forwarded-Host');
+            const proto = req.get('X-Forwarded-Proto');
             res.status(200).json({
-                link: `${req.protocol}://${req.get('host')}/api/v1/brain/${shareToken}`
+                link: `${proto}://${host}/api/v1/brain/${shareToken}`
             });
         }
         else {
