@@ -136,7 +136,7 @@ app.post("/api/v1/brain/share", userMiddleware, async (req, res) => {
             const proto = req.get('x-forwarded-proto')
 
             res.status(200).json({
-                link: `${proto}://${host}/api/v1/brain/${shareToken}`
+                link: `${req.proto}://${req.domain}/api/v1/brain/${shareToken}`
             });
         } else {
             await LinkModel.deleteOne({userId : userId})
