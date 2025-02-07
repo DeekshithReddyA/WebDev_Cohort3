@@ -78,11 +78,13 @@ app.post("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter
     const link = req.body.link;
     const type = req.body.type;
     const title = req.body.title;
+    const note = req.body.note;
     yield db_1.ContentModel.create({
         link,
         title,
         type,
         userId: req.userId,
+        note,
         tags: []
     });
     res.json({ message: "Content Added" });
@@ -97,7 +99,8 @@ app.get("/api/v1/contents", middleware_1.userMiddleware, (req, res) => __awaiter
         res.status(400).json({ message: "Server Error" });
     }
 }));
-app.delete("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+//Delete
+app.post("/api/v1/deletecontent", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const contents = yield db_1.ContentModel.findOneAndDelete({
             userId: req.userId,

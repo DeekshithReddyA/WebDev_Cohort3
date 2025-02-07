@@ -77,12 +77,14 @@ app.post("/api/v1/content", userMiddleware, async (req, res) => {
     const link = req.body.link;
     const type = req.body.type;
     const title = req.body.title;
+    const note = req.body.note;
 
     await ContentModel.create({
         link,
         title,
         type,
         userId: req.userId,
+        note,
         tags: []
     })
 
@@ -100,8 +102,8 @@ app.get("/api/v1/contents", userMiddleware, async (req, res) => {
     }
 })
 
-
-app.delete("/api/v1/content", userMiddleware, async (req, res) => {
+//Delete
+app.post("/api/v1/deletecontent", userMiddleware, async (req, res) => {
     try {
         const contents = await ContentModel.findOneAndDelete({
             userId: req.userId,

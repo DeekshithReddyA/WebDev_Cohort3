@@ -14,7 +14,7 @@ interface CreateContentProps{
     refresh: any;
 }
 
-type Content = "tweet" | "youtube";
+type Content = "tweet" | "youtube" | "note";
 
 interface formDataType {
     title : string;
@@ -27,7 +27,7 @@ export const CreateContentModal = (props: CreateContentProps) =>{
     const [responseMessage , setResponseMessage] = useState("");
 
 
-    const [type , setType] = useState<Content>("youtube");
+    const [type , setType] = useState<Content>("note");
 
     const [formData , setFormData] = useState<formDataType>({
         title : "",
@@ -49,6 +49,11 @@ export const CreateContentModal = (props: CreateContentProps) =>{
         if (response.status === 200){
             props.setOpen(false);
             props.refresh();
+            setFormData({
+                title: "",
+                link : "",
+                note : ""
+            })
         } else{
             setResponseMessage(response.data.message);
         }
@@ -99,12 +104,13 @@ export const CreateContentModal = (props: CreateContentProps) =>{
                             <TextArea name={"note"} value={formData.note} onChange={handleChange} placeholder={"Write your thoughts here..."}/>
                         </div>
                         <div className="m-4 flex items-center justify-around">
+                            <Button text="Note" variant={type === "note" ? "primary" : "secondary"} onClick={() => {
+                                setType("note")
+                                }} size="sm"/>
                             <Button text="Youtube" variant={type === "youtube"? "primary" : "secondary"} onClick={() => {
-                                console.log("youtube");
                                 setType("youtube")
                                 }} size="sm" />
                             <Button text="Tweet" variant={type === "tweet" ? "primary" : "secondary"} onClick={() => {
-                                console.log("tweet");
                                 setType("tweet")
                                 }} size="sm" />
                         </div>
