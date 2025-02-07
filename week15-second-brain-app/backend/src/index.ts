@@ -11,8 +11,9 @@ import cors from 'cors';
 
 dotenv.config();
 
-const saltRounds: number = 5
-const JWT_SECRET: any = process.env.JWT_SECRET
+const saltRounds: number = 5;
+const JWT_SECRET: any = process.env.JWT_SECRET;
+const FE_DOMAIN: any = process.env.FE_DOMAIN;
 
 
 const app = express();
@@ -133,7 +134,7 @@ app.post("/api/v1/brain/share", userMiddleware, async (req, res) => {
             { upsert: true, new: true, runValidators: true });
 
             res.status(200).json({
-                link: `${req.protocol}://${req.get('host')}/api/v1/brain/${shareToken}`
+                link: `${FE_DOMAIN}/brain/${shareToken}`
             });
         } else {
             await LinkModel.deleteOne({userId : userId})

@@ -23,6 +23,7 @@ const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const saltRounds = 5;
 const JWT_SECRET = process.env.JWT_SECRET;
+const FE_DOMAIN = process.env.FE_DOMAIN;
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
@@ -126,10 +127,8 @@ app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awa
             yield db_1.LinkModel.updateOne({ userId: userId }, { link: shareToken,
                 userId: userId
             }, { upsert: true, new: true, runValidators: true });
-            const host = req.get('X-Forwarded-Host');
-            const proto = req.get('X-Forwarded-Proto');
             res.status(200).json({
-                link: `${proto}://${host}/api/v1/brain/${shareToken}`
+                link: `${FE_DOMAIN}/brain/${shareToken}`
             });
         }
         else {
