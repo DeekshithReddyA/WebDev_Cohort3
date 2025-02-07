@@ -95,10 +95,11 @@ export const CreateContentModal = (props: CreateContentProps) =>{
                             <label className="dark:text-white pl-2">Title</label>
                             <Input icon={<Tag size="sm"/>} name={"title"} value={formData.title} placeholder="Title" onChange={handleChange} />
                         </div>
+                        { type !== "note" && 
                         <div className="m-4">
-                            <label className="dark:text-white pl-2">Link</label>
-                            <Input icon={<Link size="sm"/>} name={"link"} value={formData.link} placeholder="Link" onChange={handleChange} />
-                        </div>
+                                <label className="dark:text-white pl-2">Link</label>
+                                <Input icon={<Link size="sm"/>} name={"link"} value={formData.link} placeholder="Link" onChange={handleChange} />
+                        </div>}
                         <div className="m-4">
                             <label className="dark:text-white pl-2">Note</label>
                             <TextArea name={"note"} value={formData.note} onChange={handleChange} placeholder={"Write your thoughts here..."}/>
