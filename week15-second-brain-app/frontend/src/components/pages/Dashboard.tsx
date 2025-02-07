@@ -4,9 +4,7 @@ import { Navbar } from '../ui/Navbar'
 import { Card } from '../ui/Card'
 import { CreateContentModal } from '../ui/CreateContentModal'
 import { useState } from 'react'
-import { useContent } from '../hooks/useContent'
-import axios from 'axios'
-import { BACKEND_URL } from '../../Config'
+import { useContent } from '../hooks/useContent';
 
 interface ContentType {
   type: "youtube" | "tweet";
