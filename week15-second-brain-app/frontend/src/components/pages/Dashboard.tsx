@@ -5,6 +5,7 @@ import { Card } from '../ui/Card'
 import { CreateContentModal } from '../ui/CreateContentModal'
 import { useState } from 'react'
 import { useContent } from '../hooks/useContent';
+import { ShareBrainModal } from '../ui/ShareBrainModal'
 
 interface ContentType {
   type: "youtube" | "tweet";
@@ -17,6 +18,7 @@ interface ContentType {
 export function Dashboard() {
 
   const [contentModalOpen , setContentModalOpen] = useState<boolean>(false);
+  const [shareModalOpen , setShareModalOpen] = useState<boolean>(false);
   const {refresh , contents} = useContent();
 
 
@@ -44,9 +46,10 @@ export function Dashboard() {
             ))}
           </div>
         </div>
-        <Navbar setModalOpen={setContentModalOpen}/>
+        <Navbar setContentModalOpen={setContentModalOpen} setShareModalOpen={setShareModalOpen}/>
     </div>
     <CreateContentModal open={contentModalOpen} setOpen={setContentModalOpen} refresh={refresh}/>
+    <ShareBrainModal open={shareModalOpen} setOpen={setShareModalOpen} />
     </div>
   )
 }
