@@ -60,6 +60,8 @@ export function ShareBrainModal(props: ShareBrainProps){
     const handleGenerateLink = async (e: FormEvent) =>{
         e.preventDefault();
         setPublicVisibility(true);
+        console.log(window.location.host);
+        console.log(window.location.protocol.replace(':' , ''));
         try{
             const response = await axios.post(`${BACKEND_URL}/api/v1/brain/share`,{
                 share: true
