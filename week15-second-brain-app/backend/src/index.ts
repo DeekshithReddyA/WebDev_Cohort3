@@ -132,8 +132,8 @@ app.post("/api/v1/brain/share", userMiddleware, async (req, res) => {
                 } ,
             { upsert: true, new: true, runValidators: true });
 
-            const host = req.get('X-Forwarded-Host') 
-            const proto = req.get('X-Forwarded-Proto')
+            const host = req.get('x-forwarded-host') 
+            const proto = req.get('x-forwarded-proto')
 
             res.status(200).json({
                 link: `${proto}://${host}/api/v1/brain/${shareToken}`
