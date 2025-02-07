@@ -65,7 +65,10 @@ export function ShareBrainModal(props: ShareBrainProps){
                 share: true
             } , {
                 headers:{
-                    'Authorization' : localStorage.getItem('token')
+                    'Authorization' : localStorage.getItem('token'),
+                    'X-Forwarded-Host': window.location.host,
+                    'X-Forwarded-Proto': window.location.protocol.replace(':', '')
+
                 }
             });
             if(response.status === 200){

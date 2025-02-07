@@ -132,9 +132,11 @@ app.post("/api/v1/brain/share", userMiddleware, async (req, res) => {
                 } ,
             { upsert: true, new: true, runValidators: true });
 
+            const host = req.get('X-Forwarded-Host') || req.get('host');
+            const proto = req.get('X-Forwarded-Proto') || req.protocol;
 
             res.status(200).json({
-                link: `${req.protocol}://${req.get('host')}/api/v1/brain/${shareToken}`
+                link: `${proto}://${host}/api/v1/brain/${shareToken}`
             });
         } else {
             await LinkModel.deleteOne({userId : userId})
