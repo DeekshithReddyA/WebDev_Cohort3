@@ -25,7 +25,7 @@ export function Dashboard() {
 
   return (
     <div>
-    <div className='dark:bg-gray-1100 min-h-screen min-w-screen'>
+    <div className='dark:bg-gray-1100 bg-gray-100 min-h-screen min-w-screen'>
       <div className='pt-16'>
         <Sidebar/>
       </div>
