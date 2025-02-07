@@ -1,0 +1,1 @@
+export const contentUpdatedEvent = new CustomEvent('contentUpdated');

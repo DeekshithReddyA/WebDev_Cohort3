@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { BACKEND_URL } from "../../Config";
 import axios from "axios";
+import { contentUpdatedEvent } from "../events/event";
 
 export const useContent = () => {
     const [contents , setContents] = useState([]);
@@ -13,6 +14,7 @@ export const useContent = () => {
         })
         .then((response) => {
             setContents(response.data.contents);
+            window.dispatchEvent(contentUpdatedEvent);
         })
     }
 

@@ -118,6 +118,21 @@ app.post("/api/v1/deletecontent", middleware_1.userMiddleware, (req, res) => __a
         res.status(500).json({ message: "Server Error", error: err });
     }
 }));
+app.get("/api/v1/brain/checkshare", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.userId;
+    try {
+        const response = yield db_1.LinkModel.findOne({ userId: userId });
+        if (response) {
+            res.status(200).json({ public: true, link: response.link });
+        }
+        else {
+            res.status(203).json({ public: false });
+        }
+    }
+    catch (err) {
+        res.status(500).json({ message: "Internal Error", error: err });
+    }
+}));
 app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const share = req.body.share;
     const userId = req.userId;

@@ -120,6 +120,19 @@ app.post("/api/v1/deletecontent", userMiddleware, async (req, res) => {
     }
 });
 
+app.get("/api/v1/brain/checkshare" , userMiddleware , async (req  ,res) =>{
+    const userId = req.userId;
+    try{
+        const response = await LinkModel.findOne({userId : userId});
+        if(response){
+            res.status(200).json({public : true , link : response.link});
+        } else{
+            res.status(203).json({public: false});
+        }
+    } catch(err){
+        res.status(500).json({message : "Internal Error" , error : err})
+    }
+})
 
 app.post("/api/v1/brain/share", userMiddleware, async (req, res) => {
     const share: boolean = req.body.share;

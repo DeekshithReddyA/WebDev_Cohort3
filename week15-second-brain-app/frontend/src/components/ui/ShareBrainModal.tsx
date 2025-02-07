@@ -4,9 +4,10 @@ import { Link } from "../icons/Link";
 import { Button } from "./Button";
 import { Input } from "./Input";
 import axios from "axios";
-import { BACKEND_URL } from "../../Config";
+import { BACKEND_URL, FE_URL } from "../../Config";
 import { Clipboard } from "../icons/Clipboard";
 import { CopiedClipboard } from "../icons/CopiedClipboard";
+
 
 interface ShareBrainProps{
     open: any;
@@ -14,10 +15,31 @@ interface ShareBrainProps{
 }
 
 export function ShareBrainModal(props: ShareBrainProps){
-
     const [publicVisibility , setPublicVisibility] = useState<boolean>(false);
     const [link , setLink] = useState<string>("");
     const [copy , setCopy] = useState<boolean>(false);
+
+    useEffect(()=>{
+        try {
+            axios.get(`${BACKEND_URL}/api/v1/brain/checkshare`,{
+                headers : {
+                    'Authorization' : localStorage.getItem('token')
+                }
+            }).then((response)=>{
+                console.log(response);
+                if(response.data.public === true){
+                    setPublicVisibility(true);
+                    const url = FE_URL
+                    setLink(`${url}/brain/${response.data.link}`); 
+                } else{
+                    setPublicVisibility(false);
+                }
+            })
+        } catch(err){
+            console.log(err);
+        }
+    },[])
+
 
     useEffect(() => {
         const timeout = setTimeout(()=>{
@@ -70,7 +92,6 @@ export function ShareBrainModal(props: ShareBrainProps){
                     'Authorization' : localStorage.getItem('token'),
                     'X-Forwarded-Host': window.location.host,
                     'X-Forwarded-Proto': window.location.protocol.replace(':', '')
-
                 }
             });
             if(response.status === 200){
