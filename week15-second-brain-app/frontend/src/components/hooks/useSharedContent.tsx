@@ -3,8 +3,16 @@ import { BACKEND_URL } from "../../Config";
 import axios from "axios";
 
 
+    interface ContentType {
+  type: "youtube" | "tweet" | "note";
+  link: string;
+  title : string;
+  note: string;
+  _id : string;
+}
+
 export const useSharedContent = (id: string) => {
-    const [sharedContents , setSharedContents] = useState([]);
+    const [sharedContents , setSharedContents] = useState<ContentType[]>([]);
     const [username , setUsername] = useState("");
 
     const refreshShared = () => {

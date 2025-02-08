@@ -7,7 +7,7 @@ import { Notepage } from "../icons/NotePage";
 interface SharedCardProps {
     size: "md" | "sm";
     title: string;
-    type: "youtube" | "tweet"
+    type: "youtube" | "tweet" | "note";
     link : string;
     refresh: any;
     note: string;
