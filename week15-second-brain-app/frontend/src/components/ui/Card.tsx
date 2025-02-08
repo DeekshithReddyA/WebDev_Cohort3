@@ -27,6 +27,7 @@ const hoverStyles = "hover:cursor-pointer hover:scale-[1.02] duration-300 hover:
 
 export const Card = (props: CardProps) => {
       const handleDelete = async(_id: string) =>{
+    props.setEditOpen(false);
     try{
       const response = await axios.post(`${BACKEND_URL}/api/v1/deletecontent`,{
         contentId : _id
@@ -42,7 +43,6 @@ export const Card = (props: CardProps) => {
     } catch(err){
       console.log(err);
     }
-    props.setEditOpen(false);
   }
     
     useEffect(() => {
