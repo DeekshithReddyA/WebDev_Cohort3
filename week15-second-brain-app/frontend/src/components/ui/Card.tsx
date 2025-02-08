@@ -26,8 +26,9 @@ const hoverStyles = "hover:cursor-pointer hover:scale-[1.02] duration-300 hover:
 
 
 export const Card = (props: CardProps) => {
+
+
       const handleDelete = async(_id: string) =>{
-    props.setEditOpen(false);
     try{
       const response = await axios.post(`${BACKEND_URL}/api/v1/deletecontent`,{
         contentId : _id
@@ -81,8 +82,8 @@ export const Card = (props: CardProps) => {
                 </div>
                 <div className="flex items-center">
                     <div onClick={(e) => {
-                        e.preventDefault();
-                        handleDelete(props._id);
+                        e.stopPropagation();
+                        handleDelete(props._id);            
                     }} className={`hover:text-red-700 ${hoverStyles} text-gray-500`}>
                         <TrashIcon size="sm" />
                     </div>
@@ -106,77 +107,3 @@ export const Card = (props: CardProps) => {
         </div>
     </div>
 }
-
-
-
-// import { useState } from "react";
-// import { ShareIcon } from "../icons/ShareIcon";
-// import { TrashIcon } from "../icons/TrashIcon";
-
-// interface CardProps {
-//   size: "md" | "sm";
-//   title: string;
-//   type: "youtube" | "tweet";
-//   link: string;
-// }
-
-// export const Card = ({ size, title, type, link }: CardProps) => {
-//   const [isHovered, setIsHovered] = useState(false);
-
-//   return (
-//     <div
-//       className={`group relative overflow-hidden ${
-//         size === "md" ? "w-96" : "w-80"
-//       } bg-white rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-purple-200`}
-//       onMouseEnter={() => setIsHovered(true)}
-//       onMouseLeave={() => setIsHovered(false)}
-//     >
-//       {/* Header Section */}
-//       <div className="flex items-center justify-between p-4 pb-2">
-//         <div className="flex items-center space-x-2">
-//           <button className="p-1.5 rounded-lg hover:bg-purple-50 text-gray-500 hover:text-purple-600 transition-colors">
-//             <ShareIcon size="md" />
-//           </button>
-//           <h3 className={`font-medium ${isHovered ? "text-purple-700" : "text-gray-800"}`}>
-//             {title}
-//           </h3>
-//         </div>
-//         <button className="p-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600 transition-colors">
-//           <TrashIcon size="md" />
-//         </button>
-//       </div>
-
-//       {/* Content Section */}
-//       <div className="p-4 pt-2">
-//         {type === "youtube" && (
-//           <div className="relative aspect-video rounded-lg overflow-hidden shadow-sm">
-//             <iframe
-//               src={link.replace("watch", "embed").replace("?v=", "/")}
-//               className="absolute w-full h-full"
-//               title="YouTube video player"
-//               allowFullScreen
-//             />
-//           </div>
-//         )}
-
-//         {type === "tweet" && (
-//           <div className="relative min-h-[200px] flex items-center justify-center bg-gray-50 rounded-lg">
-//             <a
-//               href={link.replace("x.com", "twitter.com")}
-//               target="_blank"
-//               rel="noopener noreferrer"
-//               className="text-purple-600 hover:text-purple-700 text-sm font-medium"
-//             >
-//               View Tweet on Twitter
-//             </a>
-//           </div>
-//         )}
-//       </div>
-
-//       {/* Hover Overlay */}
-//       {isHovered && (
-//         <div className="absolute inset-0 bg-gradient-to-b from-purple-100/50 to-transparent pointer-events-none" />
-//       )}
-//     </div>
-//   );
-// };
