@@ -92,6 +92,25 @@ app.post("/api/v1/content", userMiddleware, async (req, res) => {
     res.json({ message: "Content Added" });
 });
 
+//Edit
+app.put("/api/v1/editcontent", userMiddleware, async (req, res) => {
+    
+    const link = req.body.link;
+    const type = req.body.type;
+    const title = req.body.title;
+    const note = req.body.note;
+    const id = req.body.contentId
+
+    const response = await ContentModel.findByIdAndUpdate({_id : id} , {
+        link,
+        title,
+        type ,
+        userId: req.userId,
+        note,
+        tags: []
+    })
+    res.json({ message: "Content Updated" });
+})
 
 app.get("/api/v1/contents", userMiddleware, async (req, res) => {
     try {

@@ -8,9 +8,11 @@ import { Notepage } from "../icons/NotePage";
 
 
 interface CardProps {
+  setEditOpen: any;
+  setCardData: any;
     size: "md" | "sm";
     title: string;
-    type: "youtube" | "tweet"
+    type: "youtube" | "tweet" | "note";
     link : string;
     _id: string;
     refresh: any;
@@ -40,6 +42,7 @@ export const Card = (props: CardProps) => {
     } catch(err){
       console.log(err);
     }
+    props.setEditOpen(false);
   }
     
     useEffect(() => {
@@ -54,7 +57,19 @@ export const Card = (props: CardProps) => {
     }
     const [hover , setHover] = useState(false);
     return <div className="relative">
-        <div className={`${sizeStyles[props.size]} ${defaultStyles} ${hoverStyles} ${hover ? "bg-gradient-to-br from-transparent to-purple-1000/10 dark:from-gray-900 dark:to-purple-1200/40" : "bg-white dark:bg-gray-1000"}`} onMouseOver={() => {setHover(true)}} onMouseLeave={() => setHover(false)}>
+        <div onClick={
+          (e) =>{
+            e.preventDefault();
+            props.setCardData({
+              title: props.title,
+              type: props.type,
+              link : props.link,
+              note: props.note,
+              contentId : props._id
+            });
+            props.setEditOpen(true);
+          }
+        } className={`${sizeStyles[props.size]} ${defaultStyles} ${hoverStyles} ${hover ? "bg-gradient-to-br from-transparent to-purple-1000/10 dark:from-gray-900 dark:to-purple-1200/40" : "bg-white dark:bg-gray-1000"}`} onMouseOver={() => {setHover(true)}} onMouseLeave={() => setHover(false)}>
             <div className="flex p-3 items-center justify-between">
                 <div className="flex items-center">
                     <div className={`pr-6 dark:text-white`}>

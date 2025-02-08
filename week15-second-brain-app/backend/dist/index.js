@@ -90,6 +90,23 @@ app.post("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter
     });
     res.json({ message: "Content Added" });
 }));
+//Edit
+app.put("/api/v1/editcontent", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const link = req.body.link;
+    const type = req.body.type;
+    const title = req.body.title;
+    const note = req.body.note;
+    const id = req.body.contentId;
+    const response = yield db_1.ContentModel.findByIdAndUpdate({ _id: id }, {
+        link,
+        title,
+        type,
+        userId: req.userId,
+        note,
+        tags: []
+    });
+    res.json({ message: "Content Updated" });
+}));
 app.get("/api/v1/contents", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const contents = yield db_1.ContentModel.find({ userId: req.userId })

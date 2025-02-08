@@ -26,7 +26,6 @@ export function ShareBrainModal(props: ShareBrainProps){
                     'Authorization' : localStorage.getItem('token')
                 }
             }).then((response)=>{
-                console.log(response);
                 if(response.data.public === true){
                     setPublicVisibility(true);
                     const url = FE_URL

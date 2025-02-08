@@ -1,12 +1,13 @@
 import { ReactElement } from "react";
 
-export const SidebarItem = ({text , icon}: {
+export const SidebarItem = ({text , icon, chosenItem}: {
     text: string;
     icon : ReactElement;
+    chosenItem : boolean;
 }) => {
     return( 
     <div className="cursor-pointer group py-1">
-        <div className="rounded-lg transition-all duration-300 flex justify-between text-gray-700 hover:bg-purple-200/60 hover:rounded-lg group-hover:-translate-y-1 transition-all duration-300 object-contain dark:hover:bg-purple-700">
+        <div className={`${chosenItem ? "dark:bg-purple-700 bg-purple-1000/70" : "hover:rounded-lg group-hover:-translate-y-1 transition-all duration-300 object-contain"} rounded-lg  flex justify-between text-gray-700`}>
             <div className="md:p-2 md:block hidden md:font-medium dark:text-white">
                 {text} 
             </div>
@@ -17,3 +18,4 @@ export const SidebarItem = ({text , icon}: {
     </div>
     )
 }
+
