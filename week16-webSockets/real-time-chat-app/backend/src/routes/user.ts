@@ -1,8 +1,13 @@
 import { Router } from "express";
 import bcrypt from 'bcrypt';
-import { RoomModel, UserModel } from "../db";
+import { MessageModel, RoomModel, UserModel } from "../db";
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+import { userMiddleware } from "../middleware";
+import mongoose from "mongoose";
+import crypto from 'crypto';
+
+type ObjectId = mongoose.Types.ObjectId;
 
 const userRouter = Router();
 
@@ -60,11 +65,16 @@ userRouter.post("/" , async(req, res) => {
     }
 });
 
-userRouter.post("/create-room" , async(req , res) => {
-    const username = req.body.username;
-    const userId = req.body.userId;
-    const name = req.body.name;
-    const roomId = req.body.roomId;
+userRouter.post("/create-room", userMiddleware , async(req , res) => {
+    const username: string = req.username
+    const userIdInString: string = req.userId;
+    const roomName: string = req.body.roomName;
+    
+    const roomId: string = crypto.randomUUID();
+    console.log(roomId);
+    console.log(typeof roomId);
+    
+    const userId: ObjectId = new mongoose.Types.ObjectId(userIdInString);
     
     try{
         const roomExists = await RoomModel.findOne({roomId});
@@ -73,7 +83,7 @@ userRouter.post("/create-room" , async(req , res) => {
         } else{
             const room = await RoomModel.create({
                 roomId ,
-                name ,
+                roomName ,
                 users : [userId]
             });
             const userData = await UserModel.findOne({username});
@@ -88,11 +98,13 @@ userRouter.post("/create-room" , async(req , res) => {
     }
 })
 
-userRouter.post("/join-room" , async(req , res) => {
-    const username = req.body.username;
-    const userId = req.body.userId;
-    const roomId: number = req.body.roomId;
-
+userRouter.post("/join-room", userMiddleware , async(req , res) => {
+    const username: string = req.username;
+    const userIdinString: string = req.userId;
+    const roomId: string = req.body.roomId;
+    
+    const userId: ObjectId = new mongoose.Types.ObjectId(userIdinString);
+    
     try{
         const roomExists = await RoomModel.findOne({roomId})
         if(roomExists){
@@ -111,6 +123,19 @@ userRouter.post("/join-room" , async(req , res) => {
         }
     } catch(err){
         res.status(500).json({message : "Server error" , error : err});
+    }
+});
+
+
+userRouter.get("/home" , userMiddleware, async (req , res) => {
+    const username: string = req.username;
+    const userId: string = req.userId;
+
+    const userData = await UserModel.find({_id : userId , username} , {password: 0}).populate("rooms");
+    if(userData[0]){
+        const rooms = userData[0].rooms;
+        const messages = await MessageModel.find({roomId : { "$in" : rooms}});
+        res.status(200).json({userData , messages });
     }
 })
 

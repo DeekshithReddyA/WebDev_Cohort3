@@ -54,7 +54,6 @@ wss.on("connection", (socket) => __awaiter(void 0, void 0, void 0, function* () 
                     (_b = allSockets.get(room)) === null || _b === void 0 ? void 0 : _b.push(socket);
                 }
             });
-            console.log(allSockets);
             // Send past messages to the user
             socket.send(JSON.stringify({
                 type: "history",
@@ -73,7 +72,6 @@ wss.on("connection", (socket) => __awaiter(void 0, void 0, void 0, function* () 
                     text: msgText,
                     timestamp: new Date()
                 });
-                console.log(newMessage);
                 yield newMessage.save();
                 // Send message to all users in the room
                 (_b = allSockets.get(roomId)) === null || _b === void 0 ? void 0 : _b.forEach((s) => {

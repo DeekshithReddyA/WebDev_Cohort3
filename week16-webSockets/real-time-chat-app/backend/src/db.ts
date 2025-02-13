@@ -1,6 +1,7 @@
 import mongoose , {model , Schema} from 'mongoose';
 import 'dotenv/config';
 
+
 const mongoURI: any = process.env.MONGO_URI;
 
 
@@ -13,13 +14,13 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true }, // Hashed password
-  rooms: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }] // List of joined rooms
+  rooms: [{ type: mongoose.Schema.Types.ObjectId, ref: "Rooms" }] // List of joined rooms
 }, { timestamps: true });
 
 
 
 const RoomSchema = new mongoose.Schema({
-  roomId: { type: Number, required: true, unique: true }, // Room id
+  roomId: { type: String, required: true, unique: true }, // Room id
   name : { type : String , required : true}, // Room name
   users: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] // Users in the room
 }, { timestamps: true });
@@ -27,7 +28,7 @@ const RoomSchema = new mongoose.Schema({
 
 const MessageSchema = new mongoose.Schema({
   sender: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // User who sent the message
-  roomId: { type: mongoose.Schema.Types.ObjectId, ref: "Room", required: true }, // Room the message belongs to
+  roomId: { type: mongoose.Schema.Types.ObjectId, ref: "Rooms", required: true }, // Room the message belongs to
   text: { type: String, required: true }, // Message text
   timestamp: { type: Date, default: Date.now }
 });

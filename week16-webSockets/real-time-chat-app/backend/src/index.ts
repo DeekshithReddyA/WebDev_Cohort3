@@ -1,11 +1,8 @@
 import { WebSocketServer, WebSocket } from "ws";
 import express from 'express';
 import cors from 'cors';
-import jwt from 'jsonwebtoken';
 import userRouter from './routes/user';
 import { MessageModel, RoomModel, UserModel } from "./db";
-import { parse } from "dotenv";
-import mongoose, { ObjectId } from "mongoose";
 
 const app = express();
 

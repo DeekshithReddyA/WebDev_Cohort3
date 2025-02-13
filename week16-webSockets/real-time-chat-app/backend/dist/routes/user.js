@@ -17,6 +17,9 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const db_1 = require("../db");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 require("dotenv/config");
+const middleware_1 = require("../middleware");
+const mongoose_1 = __importDefault(require("mongoose"));
+const crypto_1 = __importDefault(require("crypto"));
 const userRouter = (0, express_1.Router)();
 const saltRounds = 5;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -68,11 +71,14 @@ userRouter.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(500).json({ message: "Server Error", error: err });
     }
 }));
-userRouter.post("/create-room", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const username = req.body.username;
-    const userId = req.body.userId;
-    const name = req.body.name;
-    const roomId = req.body.roomId;
+userRouter.post("/create-room", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const username = req.username;
+    const userIdInString = req.userId;
+    const roomName = req.body.roomName;
+    const roomId = crypto_1.default.randomUUID();
+    console.log(roomId);
+    console.log(typeof roomId);
+    const userId = new mongoose_1.default.Types.ObjectId(userIdInString);
     try {
         const roomExists = yield db_1.RoomModel.findOne({ roomId });
         if (roomExists) {
@@ -81,7 +87,7 @@ userRouter.post("/create-room", (req, res) => __awaiter(void 0, void 0, void 0, 
         else {
             const room = yield db_1.RoomModel.create({
                 roomId,
-                name,
+                roomName,
                 users: [userId]
             });
             const userData = yield db_1.UserModel.findOne({ username });
@@ -95,10 +101,11 @@ userRouter.post("/create-room", (req, res) => __awaiter(void 0, void 0, void 0, 
         res.status(500).json({ message: "Server Error", error: err });
     }
 }));
-userRouter.post("/join-room", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const username = req.body.username;
-    const userId = req.body.userId;
+userRouter.post("/join-room", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const username = req.username;
+    const userIdinString = req.userId;
     const roomId = req.body.roomId;
+    const userId = new mongoose_1.default.Types.ObjectId(userIdinString);
     try {
         const roomExists = yield db_1.RoomModel.findOne({ roomId });
         if (roomExists) {
@@ -117,6 +124,16 @@ userRouter.post("/join-room", (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
     catch (err) {
         res.status(500).json({ message: "Server error", error: err });
+    }
+}));
+userRouter.get("/home", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const username = req.username;
+    const userId = req.userId;
+    const userData = yield db_1.UserModel.find({ _id: userId, username }, { password: 0 }).populate("rooms");
+    if (userData[0]) {
+        const rooms = userData[0].rooms;
+        const messages = yield db_1.MessageModel.find({ roomId: { "$in": rooms } });
+        res.status(200).json({ userData, messages });
     }
 }));
 exports.default = userRouter;
