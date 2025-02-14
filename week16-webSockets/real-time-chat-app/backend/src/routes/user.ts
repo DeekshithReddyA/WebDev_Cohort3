@@ -108,7 +108,7 @@ userRouter.post("/create-room", userMiddleware , async(req , res) => {
     try{
         const roomExists = await RoomModel.findOne({roomId});
         if(roomExists){
-           res.status(400).json({message : "Room with same id exists, instead join the room"}); 
+           res.status(400).json({message : "There was a problem! Please try again"}); 
         } else{
             const room = await RoomModel.create({
                 roomId ,
@@ -119,7 +119,7 @@ userRouter.post("/create-room", userMiddleware , async(req , res) => {
             const rooms = userData?.rooms;
             rooms?.push(room._id);
             await UserModel.findOneAndUpdate({username}, {rooms : rooms});
-            res.status(200).json({message : "Room created"});
+            res.status(200).json({message : "Room created", roomId : roomId});
         }
     }
     catch(err){

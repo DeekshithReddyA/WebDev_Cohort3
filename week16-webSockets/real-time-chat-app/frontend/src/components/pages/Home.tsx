@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Room } from "../ui/Room"
 import { Sidebar } from "../ui/Sidebar"
+import { CreateRoomModal } from "../ui/CreateRoomModal";
 
 const useMediaQuery = (query: string) => {
   const [matches, setMatches] = useState(false);
@@ -23,6 +24,7 @@ export const Home = () => {
     const [loading , setLoading] = useState(true);
     const isDesktop = useMediaQuery("(min-width: 768px)");
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [createRoomModelOpen , setCreateRoomModalOpen ] = useState<boolean>(false);
 
     useEffect(() => {
         // Set initial state based on screen size
@@ -30,21 +32,24 @@ export const Home = () => {
     }, [isDesktop]);
 
     return (
+      <>
         <div className="flex relative">
-            <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+            <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} setCreateRoomModalOpen={setCreateRoomModalOpen}/>
             <div className={`flex-1 transition-all duration-300 
                 ${isDesktop 
-                    ? "ml-[320px]" 
-                    : sidebarOpen 
-                        ? "ml-0" 
-                        : "ml-[70px]"
+                  ? "ml-[320px]" 
+                  : sidebarOpen 
+                  ? "ml-0" 
+                  : "ml-[70px]"
                 }`}>
                 <Room />
             </div>
+            <CreateRoomModal createRoomModalOpen={createRoomModelOpen}/>
         </div>
+      </>
     )
-}
-// export const Home = () => {
+  }
+  // export const Home = () => {
 //     const isDesktop = useMediaQuery("(min-width: 768px)");
 
   

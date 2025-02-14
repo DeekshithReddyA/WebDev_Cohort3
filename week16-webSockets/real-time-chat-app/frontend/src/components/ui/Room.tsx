@@ -3,7 +3,9 @@ import { Input } from "./Input";
 import { RoomNavbar } from "./RoomNavbar";
 
 export const Room = () => {
+
     return (
+        <>
         <div className="flex flex-col bg-neutral-900 h-screen">
             <div className="fixed top-0 w-full z-10">
                 <RoomNavbar />
@@ -50,16 +52,8 @@ export const Room = () => {
         <SendHorizontal size={24}/>
     </div>
 </div>
-
-            {/* <div className="fixed flex bottom-0 w-full bg-black pt-4 pb-6 px-4 border-t border-neutral-800">
-                <div className="flex-1">
-                    <Input placeholder="Type a message"/>
-                </div>
-                <div className="flex-shrink-0 text-white mt-2 mx-4">
-                    <SendHorizontal size={24}/>
-                </div>
-            </div> */}
         </div>
+    </>
     );
 };
 

@@ -5,6 +5,7 @@ import { RoomCard } from "./RoomCard"
 interface SidebarProps{
     sidebarOpen: boolean;
     setSidebarOpen: any;
+    setCreateRoomModalOpen: any
 }
 
 export const Sidebar = (props: SidebarProps) => {
@@ -34,7 +35,10 @@ export const Sidebar = (props: SidebarProps) => {
             ChatBuds
         </div>
         
-        <div className={`transition-opacity duration-300 
+        <div onClick={(e) =>{
+            e.preventDefault();
+            props.setCreateRoomModalOpen(true);
+        }} className={`transition-opacity duration-300 
             ${props.sidebarOpen ? "opacity-100 block" : "hidden opacity-0"} 
             my-6 ml-16 md:mx-10 text-white hover:cursor-pointer`}>
             <MessageSquarePlus size={24}/>

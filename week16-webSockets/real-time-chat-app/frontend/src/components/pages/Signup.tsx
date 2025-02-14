@@ -3,11 +3,12 @@ import { BackgroundGradientAnimation } from "../ui/background-gradient-animation
 import React, { useState } from "react";
 import { Label } from "../ui/Label";
 import { Input } from "../ui/Input";
-import { cn } from "../lib/utils";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FileUpload } from "../ui/file-upload";
 import userPP from '../assets/userPP.png';
+import { LabelInputContainer } from "../ui/LabelInputContainer";
+import { BottomGradient } from "../ui/BottomGradient";
 
 
 
@@ -101,10 +102,9 @@ export function Signup() {
         <LabelInputContainer className="mb-4">
             <div className="w-full max-w-4xl mx-auto border border-dashed bg-white dark:bg-black border-neutral-200 dark:border-neutral-800 rounded-lg">
             <FileUpload setResponseMessage={setResponseMessage} onChange={handleFileUpload} />
-    </div> 
-
-
+            </div>
         </LabelInputContainer>
+        
         <LabelInputContainer className="mb-4">
           <Label htmlFor="username">Username</Label>
           <Input name={"username"} value={formData.username} onChange={handleChange} id="username" placeholder="john_doe" type="text" />
@@ -142,29 +142,6 @@ export function Signup() {
       </p>
       </div>
     </div>
-    </div>
-  );
-};
-
-const BottomGradient = () => {
-  return (
-    <>
-      <span className="group-hover/btn:opacity-100 block transition duration-500 opacity-0 absolute h-px w-full -bottom-px inset-x-0 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
-      <span className="group-hover/btn:opacity-100 blur-sm block transition duration-500 opacity-0 absolute h-px w-1/2 mx-auto -bottom-px inset-x-10 bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
-    </>
-  );
-};
-
-const LabelInputContainer = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn("flex flex-col space-y-2 w-full", className)}>
-      {children}
     </div>
   );
 };

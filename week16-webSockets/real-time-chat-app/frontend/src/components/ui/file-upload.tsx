@@ -285,7 +285,7 @@ export const FileUpload = ({
         </div>
         <div className="flex flex-col items-center justify-center">
           <p className="relative z-20 font-sans font-bold text-neutral-700 dark:text-neutral-300 text-base">
-            Upload image
+            Upload Profile Picture
           </p>
           <p className="relative z-20 font-sans font-normal text-neutral-400 dark:text-neutral-400 text-sm mt-1">
             Drop your image here or click to upload (JPG, JPEG, PNG only)
