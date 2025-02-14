@@ -6,6 +6,8 @@ import { Input } from "../ui/Input";
 import { cn } from "../lib/utils";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { FileUpload } from "../ui/file-upload";
+import userPP from '../assets/userPP.png';
 
 
 
@@ -13,6 +15,10 @@ export function Signup() {
     const navigate = useNavigate();
 
     const [responseMessage , setResponseMessage ] = useState("");
+      const [files, setFiles] = useState<File | null>();
+  const handleFileUpload = (file: File | null) => {
+    setFiles(file);
+  };
 
     const handleChange = (e: any) => {
       const {name , value} = e.target;
@@ -26,18 +32,35 @@ export function Signup() {
     const [formData , setFormData] = useState({
       username: "",
       email : "",
-      password: ""
+      password: "",
     });
 
     const signup = async () =>{
       try{
-         const response = await axios.post("http://localhost:4000/signup" , formData );
+        
+        const submitData = new FormData();
+        submitData.append("username" , formData.username);
+        submitData.append("email" , formData.email);
+        submitData.append("password" , formData.password);
+        if(files){
+          submitData.append("profilePicture" , files)
+        } else{
+          submitData.append("profilePicture" , userPP);
+        }
+
+        console.log(submitData);
+         const response = await axios.post("http://localhost:4000/signup" , submitData,{
+          headers: {
+            'Content-Type' : 'multipart/form-data'
+          }
+         } );
          if(response.status === 200){
            localStorage.setItem('token' , response.data.token);
+           console.log(files);
            setFormData({
            username : "",
            email: "",
-           password : ""
+           password : "",
          });
          setResponseMessage("");
            navigate('/home');
@@ -72,7 +95,16 @@ export function Signup() {
       </div>
       </div>
 
-      <form className="my-4" onSubmit={handleSubmit}>
+      <form className="my-2" onSubmit={handleSubmit}>
+
+        
+        <LabelInputContainer className="mb-4">
+            <div className="w-full max-w-4xl mx-auto border border-dashed bg-white dark:bg-black border-neutral-200 dark:border-neutral-800 rounded-lg">
+            <FileUpload setResponseMessage={setResponseMessage} onChange={handleFileUpload} />
+    </div> 
+
+
+        </LabelInputContainer>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="username">Username</Label>
           <Input name={"username"} value={formData.username} onChange={handleChange} id="username" placeholder="john_doe" type="text" />

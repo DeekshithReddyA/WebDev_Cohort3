@@ -43,11 +43,25 @@ const UserSchema = new mongoose_1.default.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true }, // Hashed password
+    profilePicture: {
+        type: {
+            data: Buffer,
+            contentType: String
+        },
+        required: true
+    },
     rooms: [{ type: mongoose_1.default.Schema.Types.ObjectId, ref: "Rooms" }] // List of joined rooms
 }, { timestamps: true });
 const RoomSchema = new mongoose_1.default.Schema({
     roomId: { type: String, required: true, unique: true }, // Room id
-    name: { type: String, required: true }, // Room name
+    name: { type: String, required: true }, // Room name,
+    roomPicture: {
+        type: {
+            data: Buffer,
+            contentType: String
+        },
+        required: true
+    },
     users: [{ type: mongoose_1.default.Schema.Types.ObjectId, ref: "User" }] // Users in the room
 }, { timestamps: true });
 const MessageSchema = new mongoose_1.default.Schema({

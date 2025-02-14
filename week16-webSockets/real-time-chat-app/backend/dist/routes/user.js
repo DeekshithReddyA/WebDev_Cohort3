@@ -20,10 +20,13 @@ require("dotenv/config");
 const middleware_1 = require("../middleware");
 const mongoose_1 = __importDefault(require("mongoose"));
 const crypto_1 = __importDefault(require("crypto"));
+const multer_1 = __importDefault(require("multer"));
 const userRouter = (0, express_1.Router)();
 const saltRounds = 5;
 const JWT_SECRET = process.env.JWT_SECRET;
-userRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const storage = multer_1.default.memoryStorage();
+const upload = (0, multer_1.default)({ storage: storage });
+userRouter.post("/signup", upload.single('profilePicture'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password, username } = req.body;
     if (email === "" || password === "" || username === "" || email === undefined || password === undefined || username === undefined) {
         res.status(406).send({ message: "Enter all details" });
@@ -36,7 +39,14 @@ userRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, funct
         }
         else {
             const hashPassword = yield bcrypt_1.default.hash(password, saltRounds);
-            const response = yield db_1.UserModel.create({ username, email, password: hashPassword });
+            const userData = { username, email, password: hashPassword };
+            if (req.file) {
+                userData.profilePicture = {
+                    data: req.file.buffer,
+                    contentType: req.file.mimetype
+                };
+            }
+            const response = yield db_1.UserModel.create(userData);
             const token = jsonwebtoken_1.default.sign({
                 id: response._id,
                 username: response.username,

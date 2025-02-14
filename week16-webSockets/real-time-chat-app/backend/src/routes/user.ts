@@ -6,18 +6,30 @@ import 'dotenv/config';
 import { userMiddleware } from "../middleware";
 import mongoose from "mongoose";
 import crypto from 'crypto';
+import multer from 'multer';
 
 type ObjectId = mongoose.Types.ObjectId;
+interface userDataType  {
+    username: String;
+    email : String;
+    password: String;
+    profilePicture ?: {
+        data : any,
+        contentType : any
+    }
+}
 
 const userRouter = Router();
 
 const saltRounds: number = 5;
 const JWT_SECRET: any = process.env.JWT_SECRET;
 
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-
-userRouter.post("/signup" , async(req , res) => {
+userRouter.post("/signup" , upload.single('profilePicture'), async(req , res) => {
     const {email , password , username} = req.body;
+
     if(email === ""  || password === "" || username === "" || email === undefined || password === undefined || username === undefined){
         res.status(406).send({message : "Enter all details"});
         return;
@@ -29,7 +41,15 @@ userRouter.post("/signup" , async(req , res) => {
             res.status(406).json({message : "User with this email and username already exists."});
         } else {
             const hashPassword = await bcrypt.hash(password , saltRounds);
-            const response = await UserModel.create({username , email , password : hashPassword});
+
+            const userData:userDataType = {username , email , password : hashPassword};
+            if(req.file){
+                userData.profilePicture = {
+                    data : req.file.buffer,
+                    contentType : req.file.mimetype
+                }
+            }
+            const response = await UserModel.create(userData);
             const token = jwt.sign({
                 id : response._id,
                 username : response.username,
