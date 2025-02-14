@@ -21,7 +21,7 @@ const useMediaQuery = (query: string) => {
 
 // Home.tsx
 export const Home = () => {
-    const [loading , setLoading] = useState(true);
+    // const [loading , setLoading] = useState(true);
     const isDesktop = useMediaQuery("(min-width: 768px)");
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [createRoomModelOpen , setCreateRoomModalOpen ] = useState<boolean>(false);
@@ -44,7 +44,7 @@ export const Home = () => {
                 }`}>
                 <Room />
             </div>
-            <CreateRoomModal createRoomModalOpen={createRoomModelOpen}/>
+            <CreateRoomModal setCreateRoomModalOpen={setCreateRoomModalOpen} createRoomModalOpen={createRoomModelOpen}/>
         </div>
       </>
     )

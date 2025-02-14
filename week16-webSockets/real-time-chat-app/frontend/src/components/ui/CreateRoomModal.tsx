@@ -1,4 +1,4 @@
-import { ReactHTMLElement, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import FileUpload from "./file-upload"
 import { LabelInputContainer } from "./LabelInputContainer";
 import { Label } from "@radix-ui/react-label";
@@ -6,12 +6,13 @@ import { Input } from "./Input";
 import { BottomGradient } from "./BottomGradient";
 import roomPP from '../assets/roomPP.png';
 import axios from "axios";
-import { create } from "motion/react-client";
 import { CopiedClipboard } from "../icons/CopiedClipboard";
 import { Clipboard } from "../icons/Clipboard";
+import { X } from "lucide-react";
 
 interface CreateRoomModalProps {
-    createRoomModalOpen: boolean
+    createRoomModalOpen: boolean,
+    setCreateRoomModalOpen: any;
 }
 export const CreateRoomModal = (props: CreateRoomModalProps) => {
     const [link , setLink] = useState("");
@@ -63,9 +64,10 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
                 }
             });
             if(response.status === 200){
-                setResponseMessage(response.data.message);
+                console.log(response.data);
                 setRoomCreated(true);
                 setLink(response.data.link);
+                setResponseMessage("");
             }
         } catch(error){
             if(axios.isAxiosError(error) && error.response){
@@ -93,9 +95,23 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
         {props.createRoomModalOpen &&
             <div className="flex items-center justify-center bg-black/50 backdrop-blur-sm fixed z-50 h-screen w-screen">
                 <div className="min-w-64 bg-black outline outline-neutral-900 text-white min-h-32 rounded-md p-4">
-                    <div className="flex items-center justify-center m-2 mb-4">
+                    <div className="flex justify-end">
+                    <div onClick={(e) =>{
+                        e.preventDefault();
+                        setRoomCreated(false);
+                        setLink("");
+                        setFormData({roomName : ""});
+                        props.setCreateRoomModalOpen(false);
+                    }} className="hover:scale-[1.05] cursor-pointer transition-all duration-300 object-contain">
+                        <X />
+                    </div>
+                    </div>
+                    <div className="flex flex-col items-center justify-center m-2 mb-4">
                         <div className="text-xl font-medium">
                             Create Room
+                        </div>
+                        <div className="p-1 bg-neutral-800 rounded-lg text-red-500">
+                            {responseMessage}
                         </div>
                     </div>
                     <form onSubmit={handleSubmit} >
@@ -115,7 +131,9 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
                                 <BottomGradient />
                             </button>
                         </div>
-                    </form> <div>
+                    </form>
+                    { roomCreated && 
+                        <div>
                         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-4 h-[1px] w-full"/>
                             <div className="flex items-center">
                                 <div className="font-medium m-3">
@@ -125,9 +143,9 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
                                     <Input name={"link"} readOnly value={link}/>
                                     <div className="dark:text-white ml-2 cursor-pointer hover:scale-[1.01] transition-all duration-300 object-contain"
                                     onClick={() => {
-                                    handleCopyClick();
-                                    setCopy(true);
-                            }}>   
+                                        handleCopyClick();
+                                        setCopy(true);
+                                    }}>   
                             {copy ? <div className="scale-[1.10] transition-all duration-300 object-contain">
                                 <CopiedClipboard /> 
                                 </div>
@@ -136,6 +154,7 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
                                 </div>
                             </div>
                     </div>
+                            }
                 </div>
             </div>}
     </>

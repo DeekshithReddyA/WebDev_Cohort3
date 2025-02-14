@@ -89,30 +89,31 @@ userRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
         res.status(500).json({ message: "Server Error", error: err });
     }
 }));
-userRouter.post("/create-room", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+userRouter.post("/create-room", middleware_1.userMiddleware, upload.single("profilePicture"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.username;
     const userIdInString = req.userId;
     const roomName = req.body.roomName;
     const roomId = crypto_1.default.randomUUID();
-    console.log(roomId);
-    console.log(typeof roomId);
     const userId = new mongoose_1.default.Types.ObjectId(userIdInString);
     try {
         const roomExists = yield db_1.RoomModel.findOne({ roomId });
         if (roomExists) {
-            res.status(400).json({ message: "Room with same id exists, instead join the room" });
+            res.status(400).json({ message: "There was a problem! Please try again" });
         }
         else {
-            const room = yield db_1.RoomModel.create({
-                roomId,
-                roomName,
-                users: [userId]
-            });
+            const roomData = { roomId, name: roomName, users: [userId] };
+            if (req.file) {
+                roomData.roomPicture = {
+                    data: req.file.buffer,
+                    contentType: req.file.mimetype
+                };
+            }
+            const room = yield db_1.RoomModel.create(roomData);
             const userData = yield db_1.UserModel.findOne({ username });
             const rooms = userData === null || userData === void 0 ? void 0 : userData.rooms;
             rooms === null || rooms === void 0 ? void 0 : rooms.push(room._id);
             yield db_1.UserModel.findOneAndUpdate({ username }, { rooms: rooms });
-            res.status(200).json({ message: "Room created" });
+            res.status(200).json({ message: "Room created", link: roomId });
         }
     }
     catch (err) {

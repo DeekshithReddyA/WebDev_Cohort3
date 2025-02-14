@@ -18,6 +18,15 @@ interface userDataType  {
         contentType : any
     }
 }
+interface RoomDataType{
+    roomId : string;
+    name: string;
+    users : mongoose.Types.ObjectId[];
+    roomPicture ?: {
+        data : any,
+        contentType : any
+    }
+}
 
 const userRouter = Router();
 
@@ -94,15 +103,13 @@ userRouter.post("/signin" , async(req, res) => {
     }
 });
 
-userRouter.post("/create-room", userMiddleware , async(req , res) => {
+userRouter.post("/create-room",  userMiddleware, upload.single("profilePicture") , async(req , res) => {
     const username: string = req.username
     const userIdInString: string = req.userId;
     const roomName: string = req.body.roomName;
     
     const roomId: string = crypto.randomUUID();
-    console.log(roomId);
-    console.log(typeof roomId);
-    
+
     const userId: ObjectId = new mongoose.Types.ObjectId(userIdInString);
     
     try{
@@ -110,16 +117,19 @@ userRouter.post("/create-room", userMiddleware , async(req , res) => {
         if(roomExists){
            res.status(400).json({message : "There was a problem! Please try again"}); 
         } else{
-            const room = await RoomModel.create({
-                roomId ,
-                roomName ,
-                users : [userId]
-            });
+            const roomData: RoomDataType = {roomId , name : roomName , users: [userId]}
+            if(req.file){
+                roomData.roomPicture = {
+                    data : req.file.buffer,
+                    contentType : req.file.mimetype
+                }
+            }
+            const room = await RoomModel.create(roomData);
             const userData = await UserModel.findOne({username});
             const rooms = userData?.rooms;
             rooms?.push(room._id);
             await UserModel.findOneAndUpdate({username}, {rooms : rooms});
-            res.status(200).json({message : "Room created", roomId : roomId});
+            res.status(200).json({message : "Room created", link : roomId});
         }
     }
     catch(err){

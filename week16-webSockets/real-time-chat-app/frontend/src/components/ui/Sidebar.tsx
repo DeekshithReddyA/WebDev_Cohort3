@@ -40,7 +40,7 @@ export const Sidebar = (props: SidebarProps) => {
             props.setCreateRoomModalOpen(true);
         }} className={`transition-opacity duration-300 
             ${props.sidebarOpen ? "opacity-100 block" : "hidden opacity-0"} 
-            my-6 ml-16 md:mx-10 text-white hover:cursor-pointer`}>
+            my-6 ml-16 md:mx-10 text-white hover:cursor-pointer hover:scale-[1.02] transition-all`}>
             <MessageSquarePlus size={24}/>
         </div>
 
