@@ -129,6 +129,10 @@ userRouter.post("/join-room", middleware_1.userMiddleware, (req, res) => __await
         const roomExists = yield db_1.RoomModel.findOne({ roomId });
         if (roomExists) {
             const users = roomExists.users;
+            if (users.find((user) => user === userId)) {
+                res.status(406).json({ message: "You are already in the room" });
+                return;
+            }
             users.push(userId);
             yield db_1.RoomModel.findOneAndUpdate({ roomId }, { users: users });
             const userData = yield db_1.UserModel.findOne({ username });
@@ -148,11 +152,11 @@ userRouter.post("/join-room", middleware_1.userMiddleware, (req, res) => __await
 userRouter.get("/home", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.username;
     const userId = req.userId;
-    const userData = yield db_1.UserModel.find({ _id: userId, username }, { password: 0 }).populate("rooms");
+    const userData = yield db_1.UserModel.find({ _id: userId, username }, { password: 0, email: 0, __v: 0, profilePicture: 0 }).populate("rooms");
     if (userData[0]) {
         const rooms = userData[0].rooms;
         const messages = yield db_1.MessageModel.find({ roomId: { "$in": rooms } });
-        res.status(200).json({ userData, messages });
+        res.status(200).json({ userData: userData[0] });
     }
 }));
 exports.default = userRouter;

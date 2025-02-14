@@ -1,14 +1,23 @@
 import { SendHorizontal } from "lucide-react";
 import { Input } from "./Input";
 import { RoomNavbar } from "./RoomNavbar";
+interface RoomProps {
+    room?: {
+        name: string;
+        roomPicture?: {
+            data: any;
+            contentType: string;
+        };
+    };
+}
 
-export const Room = () => {
+export const Room = (props: RoomProps) => {
 
     return (
         <>
         <div className="flex flex-col bg-neutral-900 h-screen">
             <div className="fixed top-0 w-full z-10">
-                <RoomNavbar />
+                <RoomNavbar room={props.room}/>
             </div>
 
             <div className="flex-1 overflow-y-auto pt-16 pb-24 px-4 

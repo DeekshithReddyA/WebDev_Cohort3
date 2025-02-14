@@ -2,6 +2,9 @@ import { useEffect, useState } from "react"
 import { Room } from "../ui/Room"
 import { Sidebar } from "../ui/Sidebar"
 import { CreateRoomModal } from "../ui/CreateRoomModal";
+import { JoinRoomModal } from "../ui/JoinRoomModal";
+import {  useUserData } from "../hooks/useRooms";
+import { Landing } from "../ui/Landing";
 
 const useMediaQuery = (query: string) => {
   const [matches, setMatches] = useState(false);
@@ -21,10 +24,21 @@ const useMediaQuery = (query: string) => {
 
 // Home.tsx
 export const Home = () => {
-    // const [loading , setLoading] = useState(true);
+    const [loading , setLoading] = useState(true);
     const isDesktop = useMediaQuery("(min-width: 768px)");
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [createRoomModelOpen , setCreateRoomModalOpen ] = useState<boolean>(false);
+    const [joinRoomModalOpen, setJoinRoomModalOpen] = useState<boolean>(false);
+    const [selectedRoom , setSelectedRoom ] = useState<any>(null);
+    const {userData } = useUserData();
+    console.log(userData);
+
+    useEffect(() =>{
+      if(userData){
+        setLoading(false);
+      }
+    } ,[userData]);
+
 
     useEffect(() => {
         // Set initial state based on screen size
@@ -32,20 +46,26 @@ export const Home = () => {
     }, [isDesktop]);
 
     return (
-      <>
+      <>{
+        loading ? <div>
+          Loading
+        </div> 
+        :
         <div className="flex relative">
-            <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} setCreateRoomModalOpen={setCreateRoomModalOpen}/>
+            <Sidebar userData={userData} setSelectedRoom={setSelectedRoom} setJoinRoomModalOpen={setJoinRoomModalOpen} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} setCreateRoomModalOpen={setCreateRoomModalOpen}/>
             <div className={`flex-1 transition-all duration-300 
                 ${isDesktop 
                   ? "ml-[320px]" 
                   : sidebarOpen 
                   ? "ml-0" 
                   : "ml-[70px]"
-                }`}>
-                <Room />
+                  }`}>
+                {selectedRoom ? <Room room={selectedRoom}/> : <Landing />}
             </div>
             <CreateRoomModal setCreateRoomModalOpen={setCreateRoomModalOpen} createRoomModalOpen={createRoomModelOpen}/>
+            <JoinRoomModal joinRoomModalOpen={joinRoomModalOpen} setJoinRoomModalOpen={setJoinRoomModalOpen} />
         </div>
+                }
       </>
     )
   }

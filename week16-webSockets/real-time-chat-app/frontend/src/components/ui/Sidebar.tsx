@@ -1,14 +1,19 @@
-import { ArrowLeftToLine, Menu, MessageSquarePlus, Search, X } from "lucide-react"
+import { ArrowLeftToLine, CirclePlus, Menu, MessageSquarePlus, Search, X } from "lucide-react"
 import { Input } from "./Input"
 import { RoomCard } from "./RoomCard"
+import { userDataProps } from "../types/userData";
 
 interface SidebarProps{
     sidebarOpen: boolean;
     setSidebarOpen: any;
-    setCreateRoomModalOpen: any
+    setCreateRoomModalOpen: any;
+    setJoinRoomModalOpen: any;
+    setSelectedRoom: (room: any) => void;
+    userData?: userDataProps
 }
 
 export const Sidebar = (props: SidebarProps) => {
+
     return (
         <div className={`fixed h-screen z-20 transition-all duration-300 ease-in-out
     ${props.sidebarOpen 
@@ -40,8 +45,16 @@ export const Sidebar = (props: SidebarProps) => {
             props.setCreateRoomModalOpen(true);
         }} className={`transition-opacity duration-300 
             ${props.sidebarOpen ? "opacity-100 block" : "hidden opacity-0"} 
-            my-6 ml-16 md:mx-10 text-white hover:cursor-pointer hover:scale-[1.02] transition-all`}>
+            my-6 ml-10 text-white hover:cursor-pointer hover:scale-[1.02] transition-all`}>
             <MessageSquarePlus size={24}/>
+        </div>
+        <div onClick={(e) =>{
+            e.preventDefault();
+            props.setJoinRoomModalOpen(true);
+        }} className={`transition-opacity duration-300
+            ${props.sidebarOpen ? "opacity-100 block" : "opacity-0 hidden"}
+            my-6 mr-4 text-white cursor-pointer hover:scale-[1.02] transition-all`}>
+        <CirclePlus size={22}/>
         </div>
 
         <div className={`md:hidden transition-opacity duration-300 
@@ -65,25 +78,16 @@ export const Sidebar = (props: SidebarProps) => {
     </div>
     {/*Rooms*/}
     <div className="text-white my-4 mx-1 space-y-4">
-        <div className="hover:bg-neutral-900 p-2 transition-colors duration-300">
-            <RoomCard sidebarOpen={props.sidebarOpen}/>
-        </div>
-        <div className="hover:bg-neutral-900 p-2 transition-colors duration-300">
-                <RoomCard sidebarOpen={props.sidebarOpen}/>
+        {props.userData?.rooms?.map((room) => (
+            <div key={room._id} className="hover:bg-neutral-900 p-2 transition-colors duration-300"
+                onClick={(e) =>{
+                    e.preventDefault();
+                    props.setSelectedRoom(room);
+                }}>
+                <RoomCard roomPicture={room.roomPicture} name={room.name} sidebarOpen={props.sidebarOpen}/>
             </div>
-            <div className="hover:bg-neutral-900 p-2 transition-colors duration-300">
-                <RoomCard sidebarOpen={props.sidebarOpen}/>
-            </div>
-            <div className="hover:bg-neutral-900 p-2 transition-colors duration-300">
-                <RoomCard sidebarOpen={props.sidebarOpen}/>
-            </div>
-            <div className="hover:bg-neutral-900 p-2 transition-colors duration-300">
-                <RoomCard sidebarOpen={props.sidebarOpen}/>
-            </div>
-            <div className="hover:bg-neutral-900 p-2 transition-colors duration-300">
-                <RoomCard sidebarOpen={props.sidebarOpen}/>
-            </div>
-
+            ))
+        }
     </div>
 </div>
 

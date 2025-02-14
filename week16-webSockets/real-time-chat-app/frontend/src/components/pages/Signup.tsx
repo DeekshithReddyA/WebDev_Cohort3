@@ -6,7 +6,7 @@ import { Input } from "../ui/Input";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FileUpload } from "../ui/file-upload";
-import userPP from '../assets/userPP.png';
+import userPP from '../assets/userPP.png'
 import { LabelInputContainer } from "../ui/LabelInputContainer";
 import { BottomGradient } from "../ui/BottomGradient";
 

@@ -148,6 +148,10 @@ userRouter.post("/join-room", userMiddleware , async(req , res) => {
         const roomExists = await RoomModel.findOne({roomId})
         if(roomExists){
             const users = roomExists.users;
+            if(users.find((user) => user === userId)){
+                res.status(406).json({message : "You are already in the room"});
+                return;
+            }
             users.push(userId);
             await RoomModel.findOneAndUpdate({roomId},{users : users});
             
@@ -170,11 +174,11 @@ userRouter.get("/home" , userMiddleware, async (req , res) => {
     const username: string = req.username;
     const userId: string = req.userId;
 
-    const userData = await UserModel.find({_id : userId , username} , {password: 0}).populate("rooms");
+    const userData = await UserModel.find({_id : userId , username} , {password: 0, email : 0 , __v : 0 , profilePicture : 0}).populate("rooms");
     if(userData[0]){
         const rooms = userData[0].rooms;
         const messages = await MessageModel.find({roomId : { "$in" : rooms}});
-        res.status(200).json({userData , messages });
+        res.status(200).json({userData : userData[0] });
     }
 })
 

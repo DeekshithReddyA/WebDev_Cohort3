@@ -4,7 +4,7 @@ import { LabelInputContainer } from "./LabelInputContainer";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "./Input";
 import { BottomGradient } from "./BottomGradient";
-import roomPP from '../assets/roomPP.png';
+import groupPP from '../assets/userPP.png';
 import axios from "axios";
 import { CopiedClipboard } from "../icons/CopiedClipboard";
 import { Clipboard } from "../icons/Clipboard";
@@ -15,24 +15,24 @@ interface CreateRoomModalProps {
     setCreateRoomModalOpen: any;
 }
 export const CreateRoomModal = (props: CreateRoomModalProps) => {
-    const [link , setLink] = useState("");
-    const [copy , setCopy] = useState<boolean>(false);
+    const [link, setLink] = useState("");
+    const [copy, setCopy] = useState<boolean>(false);
     const [responseMessage, setResponseMessage] = useState("");
-    const [roomCreated , setRoomCreated] = useState<boolean>(true);
+    const [roomCreated, setRoomCreated] = useState<boolean>(false);
     const [files, setFiles] = useState<File | null>();
-    
+
     const [formData, setFormData] = useState({
         roomName: ""
     });
 
 
     useEffect(() => {
-        const timeout = setTimeout(()=>{
+        const timeout = setTimeout(() => {
             setCopy(false);
-        },1500);
+        }, 1500);
 
         return () => clearTimeout(timeout);
-    },[copy])
+    }, [copy])
 
     const handleChange = (e: any) => {
         const { name, value } = e.target;
@@ -48,29 +48,29 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
         setFiles(file);
     };
 
-    const createRoom = async() => {
+    const createRoom = async () => {
         const submitData = new FormData();
-        submitData.append("roomName" , formData.roomName);
-        if(files){
-            submitData.append("profilePicture" , files);
-        } else{
-            submitData.append("profilePicture" , roomPP);
+        submitData.append("roomName", formData.roomName);
+        if (files) {
+            submitData.append("profilePicture", files);
+        } else {
+            submitData.append("profilePicture", groupPP);
         }
         try {
-            const response = await axios.post("http://localhost:4000/create-room" , submitData ,{
+            const response = await axios.post("http://localhost:4000/create-room", submitData, {
                 headers: {
-                    'Authorization' : localStorage.getItem('token'),
-                    'Content-Type' : 'multipart/form-data'
+                    'Authorization': localStorage.getItem('token'),
+                    'Content-Type': 'multipart/form-data'
                 }
             });
-            if(response.status === 200){
+            if (response.status === 200) {
                 console.log(response.data);
                 setRoomCreated(true);
                 setLink(response.data.link);
                 setResponseMessage("");
             }
-        } catch(error){
-            if(axios.isAxiosError(error) && error.response){
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
                 setResponseMessage(error.response.data.message);
             }
         }
@@ -80,7 +80,7 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
         e.preventDefault();
         createRoom();
     }
-        const handleCopyClick = async () => {
+    const handleCopyClick = async () => {
         try {
             await window.navigator.clipboard.writeText(link);
         } catch (err) {
@@ -96,15 +96,15 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
             <div className="flex items-center justify-center bg-black/50 backdrop-blur-sm fixed z-50 h-screen w-screen">
                 <div className="min-w-64 bg-black outline outline-neutral-900 text-white min-h-32 rounded-md p-4">
                     <div className="flex justify-end">
-                    <div onClick={(e) =>{
-                        e.preventDefault();
-                        setRoomCreated(false);
-                        setLink("");
-                        setFormData({roomName : ""});
-                        props.setCreateRoomModalOpen(false);
-                    }} className="hover:scale-[1.05] cursor-pointer transition-all duration-300 object-contain">
-                        <X />
-                    </div>
+                        <div onClick={(e) => {
+                            e.preventDefault();
+                            setRoomCreated(false);
+                            setLink("");
+                            setFormData({ roomName: "" });
+                            props.setCreateRoomModalOpen(false);
+                        }} className="hover:scale-[1.05] cursor-pointer transition-all duration-300 object-contain">
+                            <X />
+                        </div>
                     </div>
                     <div className="flex flex-col items-center justify-center m-2 mb-4">
                         <div className="text-xl font-medium">
@@ -132,29 +132,29 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
                             </button>
                         </div>
                     </form>
-                    { roomCreated && 
+                    {roomCreated &&
                         <div>
-                        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-4 h-[1px] w-full"/>
+                            <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-4 h-[1px] w-full" />
                             <div className="flex items-center">
                                 <div className="font-medium m-3">
                                     Invite Link
                                 </div>
                                 <div className="flex items-center">
-                                    <Input name={"link"} readOnly value={link}/>
+                                    <Input name={"link"} readOnly value={link} />
                                     <div className="dark:text-white ml-2 cursor-pointer hover:scale-[1.01] transition-all duration-300 object-contain"
-                                    onClick={() => {
-                                        handleCopyClick();
-                                        setCopy(true);
-                                    }}>   
-                            {copy ? <div className="scale-[1.10] transition-all duration-300 object-contain">
-                                <CopiedClipboard /> 
-                                </div>
-                                : <Clipboard />}
-                        </div>
+                                        onClick={() => {
+                                            handleCopyClick();
+                                            setCopy(true);
+                                        }}>
+                                        {copy ? <div className="scale-[1.10] transition-all duration-300 object-contain">
+                                            <CopiedClipboard />
+                                        </div>
+                                            : <Clipboard />}
+                                    </div>
                                 </div>
                             </div>
-                    </div>
-                            }
+                        </div>
+                    }
                 </div>
             </div>}
     </>
