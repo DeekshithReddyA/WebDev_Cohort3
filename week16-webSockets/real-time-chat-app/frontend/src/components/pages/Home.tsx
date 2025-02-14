@@ -20,6 +20,7 @@ const useMediaQuery = (query: string) => {
 
 // Home.tsx
 export const Home = () => {
+    const [loading , setLoading] = useState(true);
     const isDesktop = useMediaQuery("(min-width: 768px)");
     const [sidebarOpen, setSidebarOpen] = useState(true);
 

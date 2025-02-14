@@ -1,19 +1,56 @@
 import { BackgroundGradientAnimation } from "../ui/background-gradient-animation";
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Label } from "../ui/Label";
 import { Input } from "../ui/Input";
 import { cn } from "../lib/utils";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 
 
 export function Signin() {
+    const [responseMessage , setResponseMessage ] = useState("");
+
+    const [formData , setFormData] = useState({
+      username : "",
+      password: ""
+    });
+
+    const handleChange = (e: any) => {
+      const {name , value} = e.target;
+
+      setFormData({
+        ...formData ,
+        [name] : value
+      })
+    }
+
+    const signin = async() => {
+      try {
+        const response = await axios.post("http://localhost:4000/signin" , formData);
+        if(response.status === 200){
+          localStorage.setItem('token' , response.data.token);
+          setFormData({
+            username : "",
+            password : ""
+          });
+          setResponseMessage("");
+          navigate('/home');
+        }
+      } catch(error){
+        if(axios.isAxiosError(error) && error.response){
+          console.log(error.response.data.message);
+          setResponseMessage(error.response.data.message);
+        }
+      }
+    }
+
     const navigate = useNavigate();
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      console.log("Form submitted");
+      signin();
     }
   return (
     <div className="flex items-center justify-center">
@@ -26,15 +63,22 @@ export function Signin() {
       <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
         Sign in to ChatBuds to continue your real-time chat experience
       </p>
+      <div className="flex flex-col items-center justify-between">
+        <div className="m-2 mt-4 p-1 bg-neutral-700 rounded-md">
+          <div className="text-red-500">
+            {responseMessage}
+          </div>
+        </div>
+      </div>
 
-      <form className="my-8" onSubmit={handleSubmit}>
+      <form className="my-5" onSubmit={handleSubmit}>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="username">Username</Label>
-          <Input id="username" placeholder="john_doe" type="text" />
+          <Input name={"username"} value={formData.username} onChange={handleChange} id="username" placeholder="john_doe" type="text" />
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" placeholder="••••••••" type="password" />
+          <Input name={"password"} value={formData.password} onChange={handleChange} id="password" placeholder="••••••••" type="password" />
         </LabelInputContainer>
 
         <button

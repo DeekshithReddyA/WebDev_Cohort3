@@ -26,11 +26,15 @@ userRouter.post("/signup" , async(req , res) => {
     try{
         const existingUser = await UserModel.findOne({email : email , username : username});
         if(existingUser){
-            res.status(406).json({message : "User with email and username already exists."});
+            res.status(406).json({message : "User with this email and username already exists."});
         } else {
             const hashPassword = await bcrypt.hash(password , saltRounds);
-            await UserModel.create({username , email , password : hashPassword});
-            res.status(200).json({message : "User signed up"});
+            const response = await UserModel.create({username , email , password : hashPassword});
+            const token = jwt.sign({
+                id : response._id,
+                username : response.username,
+            }, JWT_SECRET)
+            res.status(200).json({message : "User signed up" , token});
         }
     } catch(err){
         res.send().status(500).json({message : "Server Error" , error : err});
@@ -38,9 +42,14 @@ userRouter.post("/signup" , async(req , res) => {
 
 });
 
-userRouter.post("/" , async(req, res) => {
+userRouter.post("/signin" , async(req, res) => {
     const username = req.body.username;
     const password = req.body.password;
+    
+        if(password === "" || username === "" || password === undefined || username === undefined){
+        res.status(406).send({message : "Enter all details"});
+        return;
+    }
 
     try{
         const existingUser: any = await UserModel.findOne({username});
@@ -58,7 +67,7 @@ userRouter.post("/" , async(req, res) => {
                 res.status(400).json({message : "Wrong credentials"});
             }
         } else {
-            res.status(404).json({message : "User with this username doesn't exist"}).send();
+            res.status(404).json({message : "User with this username doesn't exist"});
         }
     } catch(err){
         res.status(500).json({message : "Server Error" , error : err});

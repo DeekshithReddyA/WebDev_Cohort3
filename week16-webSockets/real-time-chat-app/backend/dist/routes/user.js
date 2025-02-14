@@ -32,21 +32,29 @@ userRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, funct
     try {
         const existingUser = yield db_1.UserModel.findOne({ email: email, username: username });
         if (existingUser) {
-            res.status(406).json({ message: "User with email and username already exists." });
+            res.status(406).json({ message: "User with this email and username already exists." });
         }
         else {
             const hashPassword = yield bcrypt_1.default.hash(password, saltRounds);
-            yield db_1.UserModel.create({ username, email, password: hashPassword });
-            res.status(200).json({ message: "User signed up" });
+            const response = yield db_1.UserModel.create({ username, email, password: hashPassword });
+            const token = jsonwebtoken_1.default.sign({
+                id: response._id,
+                username: response.username,
+            }, JWT_SECRET);
+            res.status(200).json({ message: "User signed up", token });
         }
     }
     catch (err) {
         res.send().status(500).json({ message: "Server Error", error: err });
     }
 }));
-userRouter.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+userRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.body.username;
     const password = req.body.password;
+    if (password === "" || username === "" || password === undefined || username === undefined) {
+        res.status(406).send({ message: "Enter all details" });
+        return;
+    }
     try {
         const existingUser = yield db_1.UserModel.findOne({ username });
         if (existingUser) {
@@ -64,7 +72,7 @@ userRouter.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* (
             }
         }
         else {
-            res.status(404).json({ message: "User with this username doesn't exist" }).send();
+            res.status(404).json({ message: "User with this username doesn't exist" });
         }
     }
     catch (err) {
