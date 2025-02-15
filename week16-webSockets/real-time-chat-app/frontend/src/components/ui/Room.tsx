@@ -3,6 +3,17 @@ import { Input } from "./Input";
 import { RoomNavbar } from "./RoomNavbar";
 import { userDataProps } from "../types/userData";
 import { useEffect, useRef, useState } from "react";
+interface Message {
+        _id: string;
+        text: string;
+        timestamp: string;
+        room_id: string;
+        sender: {
+            username: string,
+            _id: string
+        };
+        isTemp: boolean;
+}
 interface RoomProps {
     room?: {
         _id: string;
@@ -22,90 +33,142 @@ interface RoomProps {
             username: string,
             _id: string
         };
+        isTemp: boolean
     }[]
     userData?: userDataProps;
     socket: WebSocket
 }
 
 export const Room = (props: RoomProps) => {
-    const [roomMessages , setRoomMessages] = useState<any[]>([]);
+    const [roomMessages , setRoomMessages] = useState<Message[]>([]);
     const [formData, setFormData] = useState({
         text: ""
     });
-    const tempId = useRef(0);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    // const tempId = useRef(0);
 
-    // Update the message filtering useEffect
-useEffect(() => {
-    if (!props.room || !props.messages) return;
-
-    const currentRoomId = props.room._id.toString();
-    const filtered = props.messages.filter(message => 
-        message.room_id.toString() === currentRoomId
-    );
-
-    // Remove duplicates from backend response
-    const uniqueMessages = filtered.reduce((acc: any[], curr: any) => {
-        if (!acc.some(msg => msg._id === curr._id)) {
-            acc.push(curr);
-        }
-        return acc;
-    }, []);
-
-    setRoomMessages(uniqueMessages);
-}, [props.room, props.messages]);
-
-    // useEffect(() => {
-    //     if (!props.room || !props.messages) return;
-
-    //     const currentRoomId = props.room._id.toString();
-    //     const filtered = props.messages.filter(message => message.room_id.toString() === currentRoomId);
-
-    //     // Ensure messages are unique
-    //     // const uniqueMessages = Array.from(new Map(filtered.map(msg => [msg._id, msg])).values());
-
-    //     setRoomMessages(filtered);
-    //     console.log(filtered);
-    // }, [props.room, props.messages]);
-
+    // Message synchronization
     useEffect(() => {
-    const messageHandler = (event: MessageEvent) => {
-        const data = JSON.parse(event.data);
-        if (data.type === "chat" && data.room_id === props.room?._id) {
-            setRoomMessages(prevMessages => {
-                // Handle final messages with tempId
-                if (data.tempId) {
-                    const filtered = prevMessages.filter(msg => msg._id !== data.tempId);
-                    const exists = filtered.some(msg => msg._id === data._id);
-                    return exists ? filtered : [...filtered, data];
-                }
-                // Handle new messages
-                const exists = prevMessages.some(msg => msg._id === data._id);
-                return exists ? prevMessages : [...prevMessages, data];
-            });
-        }
+        if (!props.room || !props.messages) return;
+
+        const currentRoomId = props.room._id.toString();
+        const filtered = props.messages
+            .filter(m => m.room_id.toString() === currentRoomId)
+            .reduce((acc: Message[], curr) => {
+                if (!acc.some(m => m._id === curr._id)) acc.push(curr);
+                return acc;
+            }, []);
+
+        setRoomMessages(prev => {
+            const newMessages = filtered.filter(fm => 
+                !prev.some(pm => pm._id === fm._id)
+            );
+            return [...prev.filter(pm => pm.isTemp), ...newMessages];
+        });
+    }, [props.room, props.messages]);
+
+    // WebSocket handler with cleanup
+    useEffect(() => {
+        const messageHandler = (event: MessageEvent) => {
+            const data = JSON.parse(event.data);
+            if (data.type === "chat" && data.room_id === props.room?._id) {
+                setRoomMessages(prev => {
+                    const exists = prev.some(m => m._id === data._id);
+                    if (exists) return prev;
+
+                    // Replace temporary message
+                    if (data.tempId) {
+                        return [
+                            ...prev.filter(m => m._id !== data.tempId),
+                            { ...data, isTemp: false }
+                        ];
+                    }
+                    
+                    return [...prev, { ...data, isTemp: false }];
+                });
+            }
+        };
+
+        props.socket.addEventListener('message', messageHandler);
+        return () => props.socket.removeEventListener('message', messageHandler);
+    }, [props.room?._id]);
+
+    // Auto-scroll to bottom
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [roomMessages]);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!formData.text.trim()) return;
+
+        const tempIdVal = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const tempMessage = {
+            _id: tempIdVal,
+            text: formData.text,
+            timestamp: new Date().toISOString(),
+            room_id: props.room!._id,
+            sender: props.userData!,
+            isTemp: true
+        };
+
+        setRoomMessages(prev => [...prev, tempMessage]);
+        
+        props.socket.send(JSON.stringify({
+            type: "chat",
+            payload: {
+                room_id: props.room!._id,
+                userId: props.userData!._id,
+                msg: formData.text,
+                tempId: tempIdVal
+            }
+        }));
+
+        setFormData({ text: "" });
     };
-    props.socket.addEventListener('message', messageHandler);
-    return () => props.socket.removeEventListener('message', messageHandler);
-}, [props.room?._id]);
 
 
-
+//     // Update the message filtering useEffect
 // useEffect(() => {
+//     if (!props.room || !props.messages) return;
+
+//     const currentRoomId = props.room._id.toString();
+//     const filtered = props.messages.filter(message => 
+//         message.room_id.toString() === currentRoomId
+//     );
+
+//     // Remove duplicates from backend response
+//     const uniqueMessages = filtered.reduce((acc: any[], curr: any) => {
+//         if (!acc.some(msg => msg._id === curr._id)) {
+//             acc.push(curr);
+//         }
+//         return acc;
+//     }, []);
+
+//     setRoomMessages(uniqueMessages);
+// }, [props.room, props.messages]);
+
+//     useEffect(() => {
 //     const messageHandler = (event: MessageEvent) => {
 //         const data = JSON.parse(event.data);
 //         if (data.type === "chat" && data.room_id === props.room?._id) {
 //             setRoomMessages(prevMessages => {
-//             const uniqueMessages = new Map(prevMessages.map(msg => [msg._id, msg])); 
-//             uniqueMessages.set(data._id, data); // Ensure uniqueness
-
-//             return Array.from(uniqueMessages.values());
-// });
-
+//                 // Handle final messages with tempId
+//                 if (data.tempId) {
+//                     const filtered = prevMessages.filter(msg => msg._id !== data.tempId);
+//                     const exists = filtered.some(msg => msg._id === data._id);
+//                     return exists ? filtered : [...filtered, data];
+//                 }
+//                 // Handle new messages
+//                 const exists = prevMessages.some(msg => msg._id === data._id);
+//                 return exists ? prevMessages : [...prevMessages, data];
+//             });
 //         }
 //     };
 //     props.socket.addEventListener('message', messageHandler);
 //     return () => props.socket.removeEventListener('message', messageHandler);
 // }, [props.room?._id]);
+
 
     const handleChange = (e: any) => {
         const { name, value } = e.target;
@@ -116,36 +179,36 @@ useEffect(() => {
         });
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if(!formData.text.trim()) return;
+//     const handleSubmit = (e: React.FormEvent) => {
+//         e.preventDefault();
+//         if(!formData.text.trim()) return;
 
-                // Generate temporary ID
-        const tempMessage = {
-            _id: tempId.current++,
-            text: formData.text,
-            timestamp: new Date().toISOString(),
-            room_id: props.room?._id,
-            sender: { _id: props.userData?._id, username: props.userData?.username },
-            isTemp: true
-        };
+//                 // Generate temporary ID
+//         const tempMessage = {
+//             _id: tempId.current++,
+//             text: formData.text,
+//             timestamp: new Date().toISOString(),
+//             room_id: props.room?._id,
+//             sender: { _id: props.userData?._id, username: props.userData?.username },
+//             isTemp: true
+//         };
 
-        // Optimistic update
-        setRoomMessages(prev => [...prev , tempMessage]);
+//         // Optimistic update
+//         setRoomMessages(prev => [...prev , tempMessage]);
         
-        props.socket.send(JSON.stringify({
-            type: "chat",
-            payload: {
-                room_id: props.room?._id,
-                userId: props.userData?._id,
-                msg: formData.text ,
-                tempId : tempMessage._id   
-            }
-        }));
+//         props.socket.send(JSON.stringify({
+//             type: "chat",
+//             payload: {
+//                 room_id: props.room?._id,
+//                 userId: props.userData?._id,
+//                 msg: formData.text ,
+//                 tempId : tempMessage._id   
+//             }
+//         }));
 
-        setFormData({text: ""});
+//         setFormData({text: ""});
         
-    }
+//     }
 
 
 
@@ -189,6 +252,7 @@ useEffect(() => {
                                 </div>
                             </div>
                         ))}
+                        <div ref={messagesEndRef} />
                         </div>
                     </div>
                 </div>

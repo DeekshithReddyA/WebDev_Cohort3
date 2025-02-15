@@ -37,8 +37,9 @@ export const Home = () => {
       userData: any,
       messages: any
     } = useUserData();
-    const socketRef = useRef<any>(null);
-
+    const socketRef = useRef<WebSocket | null>(null);
+    const reconnectAttempts = useRef(0);
+    
     
     useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
@@ -61,28 +62,43 @@ export const Home = () => {
         setLoading(false);
       }
     } ,[userData , messages]);
-    
-    useEffect(() => {
-      const ws = new WebSocket(WS_URL);
-      socketRef.current = ws;
-  
-      ws.onopen = () => {
-        console.log("Connected to websocket");
-        ws.send(JSON.stringify({
-          type : "join",
-          payload: {
-            token : localStorage.getItem('token')
-          }
-       }
-      ));
-      }
-      ws.onclose = () => {
-        console.log("WebSocket disconnected");
-        socketRef.current = new WebSocket(WS_URL)
-      };
 
-      
-    },[]);
+
+
+    const setupWebSocket = () => {
+        const ws = new WebSocket("ws://localhost:10000");
+        
+        ws.onopen = () => {
+            console.log("Connected to websocket");
+            reconnectAttempts.current = 0;
+            ws.send(JSON.stringify({
+                type: "join",
+                payload: { token: localStorage.getItem('token') }
+            }));
+        };
+
+        ws.onclose = (e) => {
+            console.log(`WebSocket closed: ${e.reason}`);
+            const timeout = Math.min(5000, (2 ** reconnectAttempts.current) * 1000);
+            setTimeout(() => {
+                reconnectAttempts.current++;
+                setupWebSocket();
+            }, timeout);
+        };
+
+        ws.onerror = (err) => {
+            console.error("WebSocket error:", err);
+            ws.close();
+        };
+
+        socketRef.current = ws;
+    };
+        useEffect(() => {
+        setupWebSocket();
+        return () => {
+            socketRef.current?.close();
+        };
+    }, []);
     
 
     useEffect(() => {
@@ -103,7 +119,7 @@ export const Home = () => {
                   ? "ml-0" 
                   : "ml-[70px]"
                   }`}>
-                {selectedRoom ? <Room key={selectedRoom._id} socket={socketRef.current} userData={userData} messages={messages} room={selectedRoom}/> : <Landing />}
+                {selectedRoom ? <Room key={selectedRoom._id} socket={socketRef.current ? socketRef.current : new WebSocket(WS_URL)} userData={userData} messages={messages} room={selectedRoom}/> : <Landing />}
             </div>
             <CreateRoomModal refresh={refresh} setCreateRoomModalOpen={setCreateRoomModalOpen} createRoomModalOpen={createRoomModelOpen}/>
             <JoinRoomModal refresh={refresh} joinRoomModalOpen={joinRoomModalOpen} setJoinRoomModalOpen={setJoinRoomModalOpen} />
