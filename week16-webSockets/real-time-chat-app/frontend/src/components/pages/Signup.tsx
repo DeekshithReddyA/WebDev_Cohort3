@@ -9,6 +9,7 @@ import { FileUpload } from "../ui/file-upload";
 import userPP from '../assets/userPP.png'
 import { LabelInputContainer } from "../ui/LabelInputContainer";
 import { BottomGradient } from "../ui/BottomGradient";
+import { BACKEND_URL } from "../../Config";
 
 
 
@@ -52,7 +53,7 @@ export function Signup() {
           submitData.append("profilePicture" , blob);
         }
         console.log(submitData);
-         const response = await axios.post("http://localhost:4000/signup" , submitData,{
+         const response = await axios.post(`${BACKEND_URL}/signup` , submitData,{
           headers: {
             'Content-Type' : 'multipart/form-data'
           }

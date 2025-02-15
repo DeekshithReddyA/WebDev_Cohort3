@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Input } from "./Input";
 import { BottomGradient } from "./BottomGradient";
 import axios from "axios";
+import { BACKEND_URL } from "../../Config";
 
 interface JoinRoomModalProps {
     joinRoomModalOpen: boolean;
@@ -24,7 +25,7 @@ export const JoinRoomModal = (props: JoinRoomModalProps) => {
 
     const joinRoom = async () => {
         try {
-            const response = await axios.post("http://localhost:4000/join-room", formData, {
+            const response = await axios.post(`${BACKEND_URL}/join-room`, formData, {
                 headers: {
                     'Authorization': localStorage.getItem('token')
                 }

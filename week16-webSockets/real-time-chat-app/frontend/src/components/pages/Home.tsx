@@ -6,6 +6,7 @@ import { JoinRoomModal } from "../ui/JoinRoomModal";
 import {  useUserData } from "../hooks/useRooms";
 import { Landing } from "../ui/Landing";
 import { Loading } from "../ui/Loading";
+import { WS_URL } from "../../Config";
 
 const useMediaQuery = (query: string) => {
   const [matches, setMatches] = useState(false);
@@ -62,7 +63,7 @@ export const Home = () => {
     } ,[userData , messages]);
     
     useEffect(() => {
-      const ws = new WebSocket("ws://localhost:8080");
+      const ws = new WebSocket(WS_URL);
       socketRef.current = ws;
   
       ws.onopen = () => {
@@ -76,7 +77,7 @@ export const Home = () => {
       }
       ws.onclose = () => {
         console.log("WebSocket disconnected");
-        socketRef.current = new WebSocket("ws://localhost:8080")
+        socketRef.current = new WebSocket(WS_URL)
       };
 
       

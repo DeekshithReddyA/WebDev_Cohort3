@@ -6,6 +6,7 @@ import { Input } from "../ui/Input";
 import { cn } from "../lib/utils";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { BACKEND_URL } from "../../Config";
 
 
 
@@ -28,7 +29,7 @@ export function Signin() {
 
     const signin = async() => {
       try {
-        const response = await axios.post("http://localhost:4000/signin" , formData);
+        const response = await axios.post(`${BACKEND_URL}/signin` , formData);
         if(response.status === 200){
           localStorage.setItem('token' , response.data.token);
           setFormData({

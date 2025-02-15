@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from "../../Config";
 
 export const useUserData = () => {
     const navigation = useNavigate();
@@ -8,7 +9,7 @@ export const useUserData = () => {
     const [messageData, setMessageData] = useState();
 
     const refresh = () => {
-        axios.get("http://localhost:4000/home" ,{
+        axios.get(`${BACKEND_URL}/home` ,{
             headers: {
                 "Authorization" : localStorage.getItem('token')
             }

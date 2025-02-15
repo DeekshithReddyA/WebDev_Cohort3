@@ -9,6 +9,7 @@ import axios from "axios";
 import { CopiedClipboard } from "../icons/CopiedClipboard";
 import { Clipboard } from "../icons/Clipboard";
 import { X } from "lucide-react";
+import { BACKEND_URL } from "../../Config";
 
 interface CreateRoomModalProps {
     createRoomModalOpen: boolean,
@@ -60,7 +61,7 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
             submitData.append("profilePicture", blob);
         }
         try {
-            const response = await axios.post("http://localhost:4000/create-room", submitData, {
+            const response = await axios.post(`${BACKEND_URL}/create-room`, submitData, {
                 headers: {
                     'Authorization': localStorage.getItem('token'),
                     'Content-Type': 'multipart/form-data'
