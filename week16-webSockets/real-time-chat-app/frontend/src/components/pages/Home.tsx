@@ -101,7 +101,7 @@ export const Home = () => {
                   ? "ml-0" 
                   : "ml-[70px]"
                   }`}>
-                {selectedRoom ? <Room socket={socketRef.current} userData={userData} messages={messages} room={selectedRoom}/> : <Landing />}
+                {selectedRoom ? <Room key={selectedRoom._id} socket={socketRef.current} userData={userData} messages={messages} room={selectedRoom}/> : <Landing />}
             </div>
             <CreateRoomModal refresh={refresh} setCreateRoomModalOpen={setCreateRoomModalOpen} createRoomModalOpen={createRoomModelOpen}/>
             <JoinRoomModal refresh={refresh} joinRoomModalOpen={joinRoomModalOpen} setJoinRoomModalOpen={setJoinRoomModalOpen} />

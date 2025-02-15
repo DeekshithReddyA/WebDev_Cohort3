@@ -98,7 +98,8 @@ wss.on("connection", (socket) => __awaiter(void 0, void 0, void 0, function* () 
                         text: msg,
                         timestamp: newMessage.timestamp,
                         room_id,
-                        sender: { _id: userId }
+                        sender: { _id: userId },
+                        tempId: parsedMessage.payload.tempId
                     };
                     (_a = allSockets.get(room_id)) === null || _a === void 0 ? void 0 : _a.forEach(socket => {
                         if (socket.readyState === ws_1.WebSocket.OPEN) {

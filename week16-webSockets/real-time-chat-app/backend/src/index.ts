@@ -105,7 +105,8 @@ wss.on("connection", async (socket) => {
                 text: msg,
                 timestamp: newMessage.timestamp,
                 room_id,
-                sender: { _id: userId }
+                sender: { _id: userId },
+                tempId: parsedMessage.payload.tempId
             };
 
             allSockets.get(room_id)?.forEach(socket => {
