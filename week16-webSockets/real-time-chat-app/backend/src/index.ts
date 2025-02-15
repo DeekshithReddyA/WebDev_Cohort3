@@ -3,10 +3,9 @@ import express from 'express';
 import cors from 'cors';
 import userRouter from './routes/user';
 import { MessageModel, UserModel } from "./db";
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { decode, JwtPayload } from 'jsonwebtoken';
 import 'dotenv/config';
 import mongoose, { mongo, ObjectId } from "mongoose";
-import { parse } from "dotenv";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -23,7 +22,7 @@ app.listen(PORT, () => {
 
 const wss = new WebSocketServer({ port: 8080 });
 
-let allSockets = new Map<string, WebSocket[]>();
+let allSockets = new Map<string, Set<WebSocket>>();
 
 const fetchUserRooms = async (username: string) => {
     const userData = await UserModel.findOne({ username } , {});
@@ -39,10 +38,13 @@ wss.on("connection", async (socket) => {
     console.log("connected to ws");
     socket.on("message", async (message) => {
         const parsedMessage = JSON.parse(message.toString());
+        console.log(parsedMessage);
 
         
         if (parsedMessage.type === "join") {
-            const username = parsedMessage.payload.username;
+            const token = parsedMessage.payload.token;
+            const decoded = jwt.verify(token as string , JWT_SECRET as string);
+            const username = (decoded as JwtPayload).username;
             const data  = await fetchUserRooms(username);
 
             if(data === null){
@@ -53,11 +55,11 @@ wss.on("connection", async (socket) => {
             data?.rooms.forEach((room: any) => {
                 const Room: string = room.toString();
                 if (!allSockets.has(Room)) {
-                    allSockets.set(Room, []);
+                    allSockets.set(Room, new Set());
                 }
 
-                allSockets.set(Room, allSockets.get(Room)?.filter(s => s !== socket) || []);
-                allSockets.get(Room)?.push(socket);
+                allSockets.get(Room)?.delete(socket); // Ensure no duplicates
+                allSockets.get(Room)?.add(socket); // Add socket
                 
             })
         }
@@ -65,46 +67,82 @@ wss.on("connection", async (socket) => {
         else if (parsedMessage.type === "chat") {
             const room_id: string = parsedMessage.payload.room_id;
             const userId: string = parsedMessage.payload.userId;
-            const msgText = parsedMessage.payload.msg;
-            
-            const newRoomId = new mongoose.mongo.ObjectId(room_id);
-            const newUserId = new mongoose.mongo.ObjectId(userId);
-            if (allSockets.get(room_id)?.some(s => s === socket)) {
-                
-                
-                // Send message to all users in the room
-                allSockets.get(room_id)?.forEach((s) => {
-                    if (s.readyState === s.OPEN) {
-                        s.send(JSON.stringify({
-                            room_id: newRoomId,
-                            type: "chat",
-                            sender: userId,
-                            text: msgText
-                        }));
-                    }
-                });
-            }          
-    
+            const msg = parsedMessage.payload.msg;
+            const tempId = parsedMessage.payload.tempId;
 
-            // Save the message in DB
-            const newMessage = await MessageModel.create({
-                room_id: newRoomId ,
-                sender: newUserId,
-                text: msgText,
-                timestamp: new Date()
+                // Immediate broadcast
+            const messageToSend = {
+                _id: tempId,
+                text: msg,
+                timestamp: new Date().toISOString(),
+                sender: { _id: userId },
+                room_id,
+                isTemp: true
+            };
+
+                // Broadcast first
+            allSockets.get(room_id)?.forEach(socket => {
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: "chat",
+                        ...messageToSend
+                    }));
+                }
             });
         
+                // Then persist asynchronously
+    const saveMessage = async () => {
+        try {
+            const newMessage = await MessageModel.create({
+                room_id: new mongoose.Types.ObjectId(room_id),
+                sender: new mongoose.Types.ObjectId(userId),
+                text: msg
+            });
+
+            // Broadcast final message
+            const finalMessage = {
+                _id: newMessage._id.toString(),
+                text: msg,
+                timestamp: newMessage.timestamp,
+                room_id,
+                sender: { _id: userId }
+            };
+
+            allSockets.get(room_id)?.forEach(socket => {
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: "chat",
+                        ...finalMessage
+                    }));
+                }
+            });
+        } catch (error) {
+            console.error("Failed to save message:", error);
+            // Optionally send error notification
+            allSockets.get(room_id)?.forEach(socket => {
+            socket.send(JSON.stringify({
+                type: "error",
+                tempId,
+                error: "Failed to save message"
+            }));
+        });
+        }
+    };
+
+        saveMessage();
 
         }
     });
 
     
     socket.on("close", () => {
-        allSockets.forEach((sockets, room_id) => {
-            allSockets.set(room_id, sockets.filter(s => s !== socket));
-            if (allSockets.get(room_id)?.length === 0) {
-                allSockets.delete(room_id);
-            }
+        console.log("socket closed");
+            allSockets.forEach((sockets, room_id) => {
+        sockets.delete(socket); // Removes socket from Set
+
+        if (sockets.size === 0) {
+            allSockets.delete(room_id);
+        }
         });
     });
 });

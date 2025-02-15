@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Room } from "../ui/Room"
 import { Sidebar } from "../ui/Sidebar"
 import { CreateRoomModal } from "../ui/CreateRoomModal";
@@ -36,7 +36,7 @@ export const Home = () => {
       userData: any,
       messages: any
     } = useUserData();
-    const [socket , setSocket] = useState<any>(null);
+    const socketRef = useRef<any>(null);
 
     
     useEffect(() => {
@@ -63,19 +63,24 @@ export const Home = () => {
     
     useEffect(() => {
       const ws = new WebSocket("ws://localhost:8080");
+      socketRef.current = ws;
   
       ws.onopen = () => {
         console.log("Connected to websocket");
         ws.send(JSON.stringify({
           type : "join",
           payload: {
-            username : userData.username
+            token : localStorage.getItem('token')
           }
-       }))
+       }));
       }
-      setSocket(ws);
+      ws.onclose = () => {
+        console.log("WebSocket disconnected");
+        socketRef.current = new WebSocket("ws://localhost:8080")
+      };
+
       
-    },[loading]);
+    },[]);
     
 
     useEffect(() => {
@@ -96,7 +101,7 @@ export const Home = () => {
                   ? "ml-0" 
                   : "ml-[70px]"
                   }`}>
-                {selectedRoom ? <Room socket={socket} userData={userData} messages={messages} room={selectedRoom}/> : <Landing />}
+                {selectedRoom ? <Room socket={socketRef.current} userData={userData} messages={messages} room={selectedRoom}/> : <Landing />}
             </div>
             <CreateRoomModal refresh={refresh} setCreateRoomModalOpen={setCreateRoomModalOpen} createRoomModalOpen={createRoomModelOpen}/>
             <JoinRoomModal refresh={refresh} joinRoomModalOpen={joinRoomModalOpen} setJoinRoomModalOpen={setJoinRoomModalOpen} />
