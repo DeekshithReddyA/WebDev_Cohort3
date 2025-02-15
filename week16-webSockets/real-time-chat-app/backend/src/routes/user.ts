@@ -40,7 +40,7 @@ userRouter.post("/signup" , upload.single('profilePicture'), async(req , res) =>
     const {email , password , username} = req.body;
 
     if(email === ""  || password === "" || username === "" || email === undefined || password === undefined || username === undefined){
-        res.status(406).send({message : "Enter all details"});
+        res.status(406).json({message : "Enter all details"});
         return;
     }
 
@@ -66,7 +66,7 @@ userRouter.post("/signup" , upload.single('profilePicture'), async(req , res) =>
             res.status(200).json({message : "User signed up" , token});
         }
     } catch(err){
-        res.send().status(500).json({message : "Server Error" , error : err});
+        res.status(500).json({message : "Server Error" , error : err});
     }
 
 });
@@ -76,7 +76,7 @@ userRouter.post("/signin" , async(req, res) => {
     const password = req.body.password;
     
         if(password === "" || username === "" || password === undefined || username === undefined){
-        res.status(406).send({message : "Enter all details"});
+        res.status(406).json({message : "Enter all details"});
         return;
     }
 
@@ -148,7 +148,7 @@ userRouter.post("/join-room", userMiddleware , async(req , res) => {
         const roomExists = await RoomModel.findOne({roomId})
         if(roomExists){
             const users = roomExists.users;
-            if(users.find((user) => user === userId)){
+            if(users.some((user) => user.toString() === userId.toString())){
                 res.status(406).json({message : "You are already in the room"});
                 return;
             }

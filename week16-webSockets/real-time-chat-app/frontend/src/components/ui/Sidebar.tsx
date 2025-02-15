@@ -78,7 +78,7 @@ export const Sidebar = (props: SidebarProps) => {
     </div>
     {/*Rooms*/}
     <div className="text-white my-4 mx-1 space-y-4">
-        {props.userData?.rooms?.map((room) => (
+        {props.userData?.rooms.length !== 0 ? props.userData?.rooms?.map((room) => (
             <div key={room._id} className="hover:bg-neutral-900 p-2 transition-colors duration-300"
                 onClick={(e) =>{
                     e.preventDefault();
@@ -86,7 +86,8 @@ export const Sidebar = (props: SidebarProps) => {
                 }}>
                 <RoomCard roomPicture={room.roomPicture} name={room.name} sidebarOpen={props.sidebarOpen}/>
             </div>
-            ))
+            )) :
+            <div className="text-white"> Create a room to start chatting </div>
         }
     </div>
 </div>

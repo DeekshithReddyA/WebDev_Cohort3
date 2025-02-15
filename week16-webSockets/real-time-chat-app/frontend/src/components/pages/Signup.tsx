@@ -43,12 +43,14 @@ export function Signup() {
         submitData.append("username" , formData.username);
         submitData.append("email" , formData.email);
         submitData.append("password" , formData.password);
-        if(files){
+        if(files instanceof File){
           submitData.append("profilePicture" , files)
         } else{
-          submitData.append("profilePicture" , userPP);
+          const response = await fetch(userPP);
+          const blob = await response.blob();
+          console.log(blob);
+          submitData.append("profilePicture" , blob);
         }
-
         console.log(submitData);
          const response = await axios.post("http://localhost:4000/signup" , submitData,{
           headers: {

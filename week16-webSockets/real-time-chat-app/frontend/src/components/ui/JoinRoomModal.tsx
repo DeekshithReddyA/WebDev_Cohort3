@@ -7,6 +7,7 @@ import axios from "axios";
 interface JoinRoomModalProps {
     joinRoomModalOpen: boolean;
     setJoinRoomModalOpen: any;
+    refresh: any;
 }
 
 export const JoinRoomModal = (props: JoinRoomModalProps) => {
@@ -29,6 +30,7 @@ export const JoinRoomModal = (props: JoinRoomModalProps) => {
                 }
             });
             if (response.status === 200) {
+                props.refresh();
                 setResponseMessage("Room Joined");
                 props.setJoinRoomModalOpen(false);
 

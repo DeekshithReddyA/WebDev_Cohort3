@@ -5,6 +5,7 @@ import { CreateRoomModal } from "../ui/CreateRoomModal";
 import { JoinRoomModal } from "../ui/JoinRoomModal";
 import {  useUserData } from "../hooks/useRooms";
 import { Landing } from "../ui/Landing";
+import { Loading } from "../ui/Loading";
 
 const useMediaQuery = (query: string) => {
   const [matches, setMatches] = useState(false);
@@ -22,7 +23,7 @@ const useMediaQuery = (query: string) => {
   return matches;
 };
 
-// Home.tsx
+
 export const Home = () => {
     const [loading , setLoading] = useState(true);
     const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -30,8 +31,23 @@ export const Home = () => {
     const [createRoomModelOpen , setCreateRoomModalOpen ] = useState<boolean>(false);
     const [joinRoomModalOpen, setJoinRoomModalOpen] = useState<boolean>(false);
     const [selectedRoom , setSelectedRoom ] = useState<any>(null);
-    const {userData } = useUserData();
+    const {refresh ,userData } = useUserData();
     console.log(userData);
+
+
+      useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                setSelectedRoom(null); // Change room state to null when Escape is pressed
+            }
+        };
+
+        document.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, []);
 
     useEffect(() =>{
       if(userData){
@@ -47,9 +63,7 @@ export const Home = () => {
 
     return (
       <>{
-        loading ? <div>
-          Loading
-        </div> 
+        loading ? <Loading />
         :
         <div className="flex relative">
             <Sidebar userData={userData} setSelectedRoom={setSelectedRoom} setJoinRoomModalOpen={setJoinRoomModalOpen} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} setCreateRoomModalOpen={setCreateRoomModalOpen}/>
@@ -62,8 +76,8 @@ export const Home = () => {
                   }`}>
                 {selectedRoom ? <Room room={selectedRoom}/> : <Landing />}
             </div>
-            <CreateRoomModal setCreateRoomModalOpen={setCreateRoomModalOpen} createRoomModalOpen={createRoomModelOpen}/>
-            <JoinRoomModal joinRoomModalOpen={joinRoomModalOpen} setJoinRoomModalOpen={setJoinRoomModalOpen} />
+            <CreateRoomModal refresh={refresh} setCreateRoomModalOpen={setCreateRoomModalOpen} createRoomModalOpen={createRoomModelOpen}/>
+            <JoinRoomModal refresh={refresh} joinRoomModalOpen={joinRoomModalOpen} setJoinRoomModalOpen={setJoinRoomModalOpen} />
         </div>
                 }
       </>

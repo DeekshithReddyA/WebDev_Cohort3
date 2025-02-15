@@ -4,7 +4,7 @@ import { LabelInputContainer } from "./LabelInputContainer";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "./Input";
 import { BottomGradient } from "./BottomGradient";
-import groupPP from '../assets/userPP.png';
+import groupPP from '../assets/roomPP.png';
 import axios from "axios";
 import { CopiedClipboard } from "../icons/CopiedClipboard";
 import { Clipboard } from "../icons/Clipboard";
@@ -13,6 +13,7 @@ import { X } from "lucide-react";
 interface CreateRoomModalProps {
     createRoomModalOpen: boolean,
     setCreateRoomModalOpen: any;
+    refresh: any;
 }
 export const CreateRoomModal = (props: CreateRoomModalProps) => {
     const [link, setLink] = useState("");
@@ -51,10 +52,12 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
     const createRoom = async () => {
         const submitData = new FormData();
         submitData.append("roomName", formData.roomName);
-        if (files) {
+        if (files instanceof File) {
             submitData.append("profilePicture", files);
         } else {
-            submitData.append("profilePicture", groupPP);
+            const response = await fetch(groupPP);
+            const blob = await response.blob();
+            submitData.append("profilePicture", blob);
         }
         try {
             const response = await axios.post("http://localhost:4000/create-room", submitData, {
@@ -65,6 +68,7 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
             });
             if (response.status === 200) {
                 console.log(response.data);
+                props.refresh();
                 setRoomCreated(true);
                 setLink(response.data.link);
                 setResponseMessage("");

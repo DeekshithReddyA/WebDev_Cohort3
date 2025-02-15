@@ -29,7 +29,7 @@ const upload = (0, multer_1.default)({ storage: storage });
 userRouter.post("/signup", upload.single('profilePicture'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password, username } = req.body;
     if (email === "" || password === "" || username === "" || email === undefined || password === undefined || username === undefined) {
-        res.status(406).send({ message: "Enter all details" });
+        res.status(406).json({ message: "Enter all details" });
         return;
     }
     try {
@@ -55,14 +55,14 @@ userRouter.post("/signup", upload.single('profilePicture'), (req, res) => __awai
         }
     }
     catch (err) {
-        res.send().status(500).json({ message: "Server Error", error: err });
+        res.status(500).json({ message: "Server Error", error: err });
     }
 }));
 userRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.body.username;
     const password = req.body.password;
     if (password === "" || username === "" || password === undefined || username === undefined) {
-        res.status(406).send({ message: "Enter all details" });
+        res.status(406).json({ message: "Enter all details" });
         return;
     }
     try {
@@ -129,7 +129,7 @@ userRouter.post("/join-room", middleware_1.userMiddleware, (req, res) => __await
         const roomExists = yield db_1.RoomModel.findOne({ roomId });
         if (roomExists) {
             const users = roomExists.users;
-            if (users.find((user) => user === userId)) {
+            if (users.some((user) => user.toString() === userId.toString())) {
                 res.status(406).json({ message: "You are already in the room" });
                 return;
             }
