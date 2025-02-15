@@ -31,30 +31,52 @@ export const Home = () => {
     const [createRoomModelOpen , setCreateRoomModalOpen ] = useState<boolean>(false);
     const [joinRoomModalOpen, setJoinRoomModalOpen] = useState<boolean>(false);
     const [selectedRoom , setSelectedRoom ] = useState<any>(null);
-    const {refresh ,userData } = useUserData();
-    console.log(userData);
+    const {refresh ,userData , messages }:{
+      refresh: any,
+      userData: any,
+      messages: any
+    } = useUserData();
+    const [socket , setSocket] = useState<any>(null);
 
-
-      useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === "Escape") {
-                setSelectedRoom(null); // Change room state to null when Escape is pressed
-            }
-        };
-
-        document.addEventListener("keydown", handleKeyDown);
-
-        return () => {
-            document.removeEventListener("keydown", handleKeyDown);
-        };
+    
+    useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === "Escape") {
+          setSelectedRoom(null); // Change room state to null when Escape is pressed
+        }
+      };
+      
+      document.addEventListener("keydown", handleKeyDown);
+      
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+      };
     }, []);
 
     useEffect(() =>{
-      if(userData){
+      if(userData && messages){
+        console.log("Messages : "+ messages);
+        
         setLoading(false);
       }
-    } ,[userData]);
-
+    } ,[userData , messages]);
+    
+    useEffect(() => {
+      const ws = new WebSocket("ws://localhost:8080");
+  
+      ws.onopen = () => {
+        console.log("Connected to websocket");
+        ws.send(JSON.stringify({
+          type : "join",
+          payload: {
+            username : userData.username
+          }
+       }))
+      }
+      setSocket(ws);
+      
+    },[loading]);
+    
 
     useEffect(() => {
         // Set initial state based on screen size
@@ -66,7 +88,7 @@ export const Home = () => {
         loading ? <Loading />
         :
         <div className="flex relative">
-            <Sidebar userData={userData} setSelectedRoom={setSelectedRoom} setJoinRoomModalOpen={setJoinRoomModalOpen} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} setCreateRoomModalOpen={setCreateRoomModalOpen}/>
+            <Sidebar refresh={refresh} userData={userData} setSelectedRoom={setSelectedRoom} setJoinRoomModalOpen={setJoinRoomModalOpen} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} setCreateRoomModalOpen={setCreateRoomModalOpen}/>
             <div className={`flex-1 transition-all duration-300 
                 ${isDesktop 
                   ? "ml-[320px]" 
@@ -74,7 +96,7 @@ export const Home = () => {
                   ? "ml-0" 
                   : "ml-[70px]"
                   }`}>
-                {selectedRoom ? <Room room={selectedRoom}/> : <Landing />}
+                {selectedRoom ? <Room socket={socket} userData={userData} messages={messages} room={selectedRoom}/> : <Landing />}
             </div>
             <CreateRoomModal refresh={refresh} setCreateRoomModalOpen={setCreateRoomModalOpen} createRoomModalOpen={createRoomModelOpen}/>
             <JoinRoomModal refresh={refresh} joinRoomModalOpen={joinRoomModalOpen} setJoinRoomModalOpen={setJoinRoomModalOpen} />

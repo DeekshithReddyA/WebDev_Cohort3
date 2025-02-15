@@ -17,6 +17,9 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const user_1 = __importDefault(require("./routes/user"));
 const db_1 = require("./db");
+require("dotenv/config");
+const mongoose_1 = __importDefault(require("mongoose"));
+const JWT_SECRET = process.env.JWT_SECRET;
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
@@ -27,71 +30,69 @@ app.listen(PORT, () => {
 });
 const wss = new ws_1.WebSocketServer({ port: 8080 });
 let allSockets = new Map();
-const fetchUserRoomsAndMessages = (username) => __awaiter(void 0, void 0, void 0, function* () {
-    const userData = yield db_1.UserModel.findOne({ username });
+const fetchUserRooms = (username) => __awaiter(void 0, void 0, void 0, function* () {
+    const userData = yield db_1.UserModel.findOne({ username }, {});
     if (!userData)
         return null;
     const rooms = userData.rooms.map(room => room._id);
-    const messages = yield db_1.MessageModel.find({ roomId: { "$in": rooms } })
-        .populate("sender", "username")
-        .sort({ timestamp: 1 });
-    return { userData, rooms, messages };
+    return { rooms };
 });
 wss.on("connection", (socket) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("connected to ws");
     socket.on("message", (message) => __awaiter(void 0, void 0, void 0, function* () {
         var _a, _b;
         const parsedMessage = JSON.parse(message.toString());
         if (parsedMessage.type === "join") {
             const username = parsedMessage.payload.username;
-            const data = yield fetchUserRoomsAndMessages(username);
+            const data = yield fetchUserRooms(username);
+            if (data === null) {
+                socket.close();
+                return;
+            }
             data === null || data === void 0 ? void 0 : data.rooms.forEach((room) => {
                 var _a, _b;
-                room = room.toString();
-                if (!allSockets.has(room)) {
-                    allSockets.set(room, []);
+                const Room = room.toString();
+                if (!allSockets.has(Room)) {
+                    allSockets.set(Room, []);
                 }
-                if (!((_a = allSockets.get(room)) === null || _a === void 0 ? void 0 : _a.some(s => s === socket))) {
-                    (_b = allSockets.get(room)) === null || _b === void 0 ? void 0 : _b.push(socket);
-                }
+                allSockets.set(Room, ((_a = allSockets.get(Room)) === null || _a === void 0 ? void 0 : _a.filter(s => s !== socket)) || []);
+                (_b = allSockets.get(Room)) === null || _b === void 0 ? void 0 : _b.push(socket);
             });
-            // Send past messages to the user
-            socket.send(JSON.stringify({
-                type: "history",
-                messages: data === null || data === void 0 ? void 0 : data.messages
-            }));
         }
         else if (parsedMessage.type === "chat") {
-            const roomId = parsedMessage.payload.roomId;
+            const room_id = parsedMessage.payload.room_id;
             const userId = parsedMessage.payload.userId;
             const msgText = parsedMessage.payload.msg;
-            if ((_a = allSockets.get(roomId)) === null || _a === void 0 ? void 0 : _a.some(s => s === socket)) {
-                // Save the message in DB
-                const newMessage = new db_1.MessageModel({
-                    roomId,
-                    sender: userId,
-                    text: msgText,
-                    timestamp: new Date()
-                });
-                yield newMessage.save();
+            const newRoomId = new mongoose_1.default.mongo.ObjectId(room_id);
+            const newUserId = new mongoose_1.default.mongo.ObjectId(userId);
+            if ((_a = allSockets.get(room_id)) === null || _a === void 0 ? void 0 : _a.some(s => s === socket)) {
                 // Send message to all users in the room
-                (_b = allSockets.get(roomId)) === null || _b === void 0 ? void 0 : _b.forEach((s) => {
+                (_b = allSockets.get(room_id)) === null || _b === void 0 ? void 0 : _b.forEach((s) => {
                     if (s.readyState === s.OPEN) {
                         s.send(JSON.stringify({
+                            room_id: newRoomId,
                             type: "chat",
                             sender: userId,
-                            message: msgText
+                            text: msgText
                         }));
                     }
                 });
             }
+            // Save the message in DB
+            const newMessage = yield db_1.MessageModel.create({
+                room_id: newRoomId,
+                sender: newUserId,
+                text: msgText,
+                timestamp: new Date()
+            });
         }
     }));
     socket.on("close", () => {
-        allSockets.forEach((sockets, roomId) => {
+        allSockets.forEach((sockets, room_id) => {
             var _a;
-            allSockets.set(roomId, sockets.filter(s => s !== socket));
-            if (((_a = allSockets.get(roomId)) === null || _a === void 0 ? void 0 : _a.length) === 0) {
-                allSockets.delete(roomId);
+            allSockets.set(room_id, sockets.filter(s => s !== socket));
+            if (((_a = allSockets.get(room_id)) === null || _a === void 0 ? void 0 : _a.length) === 0) {
+                allSockets.delete(room_id);
             }
         });
     });

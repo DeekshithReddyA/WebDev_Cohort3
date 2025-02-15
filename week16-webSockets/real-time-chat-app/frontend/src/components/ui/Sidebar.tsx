@@ -9,7 +9,8 @@ interface SidebarProps{
     setCreateRoomModalOpen: any;
     setJoinRoomModalOpen: any;
     setSelectedRoom: (room: any) => void;
-    userData?: userDataProps
+    userData?: userDataProps;
+    refresh:any;
 }
 
 export const Sidebar = (props: SidebarProps) => {
@@ -83,6 +84,7 @@ export const Sidebar = (props: SidebarProps) => {
                 onClick={(e) =>{
                     e.preventDefault();
                     props.setSelectedRoom(room);
+                    props.refresh();
                 }}>
                 <RoomCard roomPicture={room.roomPicture} name={room.name} sidebarOpen={props.sidebarOpen}/>
             </div>

@@ -155,8 +155,18 @@ userRouter.get("/home", middleware_1.userMiddleware, (req, res) => __awaiter(voi
     const userData = yield db_1.UserModel.find({ _id: userId, username }, { password: 0, email: 0, __v: 0, profilePicture: 0 }).populate("rooms");
     if (userData[0]) {
         const rooms = userData[0].rooms;
-        const messages = yield db_1.MessageModel.find({ roomId: { "$in": rooms } });
-        res.status(200).json({ userData: userData[0] });
+        const messages = yield db_1.MessageModel.find({ room_id: { "$in": rooms } })
+            .populate({
+            path: "sender",
+            select: "username profilePicture"
+        })
+            .sort({ createdAt: 1 })
+            .lean()
+            .catch((error) => res.status(400).json({ error }));
+        res.status(200).json({ userData: userData[0], messages });
+    }
+    else {
+        res.status(404).json({ message: "User not found" });
     }
 }));
 exports.default = userRouter;

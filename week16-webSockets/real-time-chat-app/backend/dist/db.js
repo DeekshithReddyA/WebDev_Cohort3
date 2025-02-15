@@ -66,7 +66,7 @@ const RoomSchema = new mongoose_1.default.Schema({
 }, { timestamps: true });
 const MessageSchema = new mongoose_1.default.Schema({
     sender: { type: mongoose_1.default.Schema.Types.ObjectId, ref: "User", required: true }, // User who sent the message
-    roomId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: "Rooms", required: true }, // Room the message belongs to
+    room_id: { type: mongoose_1.default.Schema.Types.ObjectId, ref: "Rooms", required: true }, // Room the message belongs to
     text: { type: String, required: true }, // Message text
     timestamp: { type: Date, default: Date.now }
 });
