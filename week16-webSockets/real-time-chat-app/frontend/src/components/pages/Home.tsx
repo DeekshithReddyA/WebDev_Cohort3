@@ -73,7 +73,8 @@ export const Home = () => {
           payload: {
             token : localStorage.getItem('token')
           }
-       }));
+       }
+      ));
       }
       ws.onclose = () => {
         console.log("WebSocket disconnected");

@@ -11,12 +11,12 @@ import mongoose, { mongo, ObjectId } from "mongoose";
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const app = express();
+app.use(cors());
 
 const server = createServer(app);
 
 const PORT = process.env.PORT || 10000;
 
-app.use(cors());
 app.use(express.json());
 app.use("/", userRouter);
 
@@ -151,5 +151,5 @@ wss.on("connection", async (socket) => {
 
 
 server.listen(PORT, () => {
-    console.log(" server running on port " + PORT);
+    console.log(" server running on port su" + PORT);
 });

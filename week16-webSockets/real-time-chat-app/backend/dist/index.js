@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const ws_1 = require("ws");
+const http_1 = require("http");
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const user_1 = __importDefault(require("./routes/user"));
@@ -22,14 +23,12 @@ require("dotenv/config");
 const mongoose_1 = __importDefault(require("mongoose"));
 const JWT_SECRET = process.env.JWT_SECRET;
 const app = (0, express_1.default)();
+const server = (0, http_1.createServer)(app);
+const PORT = process.env.PORT || 10000;
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use("/", user_1.default);
-const PORT = 4000;
-app.listen(PORT, () => {
-    console.log("HTTP server running on http://localhost:" + PORT);
-});
-const wss = new ws_1.WebSocketServer({ port: 8080 });
+const wss = new ws_1.WebSocket.Server({ server });
 let allSockets = new Map();
 const fetchUserRooms = (username) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = yield db_1.UserModel.findOne({ username }, {});
@@ -132,3 +131,6 @@ wss.on("connection", (socket) => __awaiter(void 0, void 0, void 0, function* () 
         });
     });
 }));
+server.listen(PORT, () => {
+    console.log(" server running on port " + PORT);
+});
