@@ -65,7 +65,7 @@ export const Home = () => {
 
 
     const setupWebSocket = () => {
-        const ws = new WebSocket("ws://localhost:10000");
+        const ws = new WebSocket(`${WS_URL}`);
         
         ws.onopen = () => {
             console.log("Connected to websocket");
