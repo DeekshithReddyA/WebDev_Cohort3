@@ -9,10 +9,9 @@ interface Message {
         timestamp: string;
         room_id: string;
         sender: {
-            username: string,
+            username?: string,
             _id: string
         };
-        isTemp: boolean;
 }
 interface RoomProps {
     room?: {
@@ -24,17 +23,7 @@ interface RoomProps {
             contentType: string;
         };
     };
-    messages?: {
-        _id: string;
-        text: string;
-        timestamp: string;
-        room_id: string;
-        sender: {
-            username: string,
-            _id: string
-        };
-        isTemp: boolean
-    }[]
+    messages?: Message[]
     userData?: userDataProps;
     socket: WebSocket
 }
@@ -45,47 +34,22 @@ export const Room = (props: RoomProps) => {
         text: ""
     });
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    // const tempId = useRef(0);
-
-    // Message synchronization
-    useEffect(() => {
-        if (!props.room || !props.messages) return;
-
-        const currentRoomId = props.room._id.toString();
-        const filtered = props.messages
-            .filter(m => m.room_id.toString() === currentRoomId)
-            .reduce((acc: Message[], curr) => {
-                if (!acc.some(m => m._id === curr._id)) acc.push(curr);
-                return acc;
-            }, []);
-
-        setRoomMessages(prev => {
-            const newMessages = filtered.filter(fm => 
-                !prev.some(pm => pm._id === fm._id)
-            );
-            return [...prev.filter(pm => pm.isTemp), ...newMessages];
-        });
-    }, [props.room, props.messages]);
 
     // WebSocket handler with cleanup
+    useEffect(() =>{
+        const filtered_messages = props.messages?.filter((message) => {
+            return message.room_id === props.room?._id}
+        );
+        if(filtered_messages !== undefined){
+            setRoomMessages(filtered_messages);
+        }
+    },[props.room?._id, props.messages]);
+
     useEffect(() => {
         const messageHandler = (event: MessageEvent) => {
             const data = JSON.parse(event.data);
             if (data.type === "chat" && data.room_id === props.room?._id) {
-                setRoomMessages(prev => {
-                    const exists = prev.some(m => m._id === data._id);
-                    if (exists) return prev;
-
-                    // Replace temporary message
-                    if (data.tempId) {
-                        return [
-                            ...prev.filter(m => m._id !== data.tempId),
-                            { ...data, isTemp: false }
-                        ];
-                    }
-                    
-                    return [...prev, { ...data, isTemp: false }];
-                });
+                setRoomMessages(prev => [...prev, data]);
             }
         };
 
@@ -102,72 +66,18 @@ export const Room = (props: RoomProps) => {
         e.preventDefault();
         if (!formData.text.trim()) return;
 
-        const tempIdVal = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        const tempMessage = {
-            _id: tempIdVal,
-            text: formData.text,
-            timestamp: new Date().toISOString(),
-            room_id: props.room!._id,
-            sender: props.userData!,
-            isTemp: true
-        };
-
-        setRoomMessages(prev => [...prev, tempMessage]);
         
         props.socket.send(JSON.stringify({
             type: "chat",
             payload: {
-                room_id: props.room!._id,
-                userId: props.userData!._id,
+                room_id: props.room?._id,
+                userId: props.userData?._id,
                 msg: formData.text,
-                tempId: tempIdVal
             }
         }));
 
         setFormData({ text: "" });
     };
-
-
-//     // Update the message filtering useEffect
-// useEffect(() => {
-//     if (!props.room || !props.messages) return;
-
-//     const currentRoomId = props.room._id.toString();
-//     const filtered = props.messages.filter(message => 
-//         message.room_id.toString() === currentRoomId
-//     );
-
-//     // Remove duplicates from backend response
-//     const uniqueMessages = filtered.reduce((acc: any[], curr: any) => {
-//         if (!acc.some(msg => msg._id === curr._id)) {
-//             acc.push(curr);
-//         }
-//         return acc;
-//     }, []);
-
-//     setRoomMessages(uniqueMessages);
-// }, [props.room, props.messages]);
-
-//     useEffect(() => {
-//     const messageHandler = (event: MessageEvent) => {
-//         const data = JSON.parse(event.data);
-//         if (data.type === "chat" && data.room_id === props.room?._id) {
-//             setRoomMessages(prevMessages => {
-//                 // Handle final messages with tempId
-//                 if (data.tempId) {
-//                     const filtered = prevMessages.filter(msg => msg._id !== data.tempId);
-//                     const exists = filtered.some(msg => msg._id === data._id);
-//                     return exists ? filtered : [...filtered, data];
-//                 }
-//                 // Handle new messages
-//                 const exists = prevMessages.some(msg => msg._id === data._id);
-//                 return exists ? prevMessages : [...prevMessages, data];
-//             });
-//         }
-//     };
-//     props.socket.addEventListener('message', messageHandler);
-//     return () => props.socket.removeEventListener('message', messageHandler);
-// }, [props.room?._id]);
 
 
     const handleChange = (e: any) => {
@@ -178,39 +88,6 @@ export const Room = (props: RoomProps) => {
             [name]: value
         });
     }
-
-//     const handleSubmit = (e: React.FormEvent) => {
-//         e.preventDefault();
-//         if(!formData.text.trim()) return;
-
-//                 // Generate temporary ID
-//         const tempMessage = {
-//             _id: tempId.current++,
-//             text: formData.text,
-//             timestamp: new Date().toISOString(),
-//             room_id: props.room?._id,
-//             sender: { _id: props.userData?._id, username: props.userData?.username },
-//             isTemp: true
-//         };
-
-//         // Optimistic update
-//         setRoomMessages(prev => [...prev , tempMessage]);
-        
-//         props.socket.send(JSON.stringify({
-//             type: "chat",
-//             payload: {
-//                 room_id: props.room?._id,
-//                 userId: props.userData?._id,
-//                 msg: formData.text ,
-//                 tempId : tempMessage._id   
-//             }
-//         }));
-
-//         setFormData({text: ""});
-        
-//     }
-
-
 
     return (
         <>
@@ -226,25 +103,17 @@ export const Room = (props: RoomProps) => {
 
                     <div className="flex flex-col space-y-4 mt-6">
                         <div className="flex flex-col space-y-4">
-                            {/* {roomMessages?.map((message: any, i: any) => (
-                                <div key={i} className={`flex ${(message.sender.username === props.userData?.username) ? 'items-end flex-col' : 'items-start'}`}>
-                                    <div className={`max-w-64 p-3 rounded-lg break-words ${(message.sender.username === props.userData?.username) ? 'bg-blue-600' : 'bg-neutral-800'
-                                        } text-white`}>
-                                        {message.text}
-                                    </div>
-                                </div>
-                            ))} */}
                             {roomMessages
                         .sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
                         .map((message, index) => (
-                            <div key={message._id || `temp-${index}`} className={`flex ${
+                            <div key={`temp-${index}`} className={`flex ${
                                 message.sender._id === props.userData?._id ? 
                                 'items-end flex-col' : 'items-start'
                             }`}>
                                 <div className={`max-w-64 p-3 rounded-lg break-words ${
                                     message.sender._id === props.userData?._id ?
                                     'bg-blue-600' : 'bg-neutral-800'
-                                } text-white ${message.isTemp ? 'opacity-75' : ''}`}>
+                                } text-white`}>
                                     {message.text}
                                     <div className="text-xs mt-1 opacity-70">
                                         {new Date(message.timestamp).toLocaleTimeString()}
@@ -277,38 +146,3 @@ export const Room = (props: RoomProps) => {
     );
 };
 
-
-
-// import { Input } from "./Input";
-// import { RoomNavbar } from "./RoomNavbar";
-
-// export const Room = () => {
-//     return (
-//     <>
-//         <div className="fixed min-w-full">
-//             <RoomNavbar />
-//         </div>
-//         <div className="h-screen overflow-y-auto bg-black text-white
-//             scrollbar-thin
-//             scrollbar-track-neutral-800 
-//             scrollbar-thumb-neutral-600">
-//             <div className="mt-24 m-4">
-//                 <div className="">
-//                 <div className="flex p-2 rounded-lg max-w-64 text-black bg-white">
-//                     Hello testing
-//                 </div>
-//                 <div className="flex p-2 rounded-lg text-black bg-white">
-//                     Hello testing1
-//                 </div>
-//                 <div className="p-2 rounded-lg text-black bg-white">
-//                     Hello testing1
-//                 </div>
-//                 </div>
-//             </div>
-//         </div>
-//         <div className="bottom min-w-full bg-red-500">
-//             <Input placeholder="Type a message"/>
-//         </div>
-//     </>
-//     );
-// }

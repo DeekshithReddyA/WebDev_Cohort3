@@ -56,8 +56,7 @@ export const Home = () => {
     }, []);
 
     useEffect(() =>{
-      if(userData && messages){
-        console.log("Messages : "+ messages);
+      if(userData && messages){;
         
         setLoading(false);
       }

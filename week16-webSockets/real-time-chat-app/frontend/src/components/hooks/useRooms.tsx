@@ -15,7 +15,6 @@ export const useUserData = () => {
             }
         })
         .then((response) => {
-            console.log(response.data);
             setUserData(response.data.userData);
             setMessageData(response.data.messages);
         })
