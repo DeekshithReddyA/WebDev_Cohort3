@@ -3,6 +3,7 @@ import { Input } from "./Input";
 import { RoomNavbar } from "./RoomNavbar";
 import { userDataProps } from "../types/userData";
 import { useEffect, useRef, useState } from "react";
+import { InfoModal } from "./InfoModal";
 interface Message {
         _id: string;
         text: string;
@@ -25,7 +26,9 @@ interface RoomProps {
     };
     messages?: Message[]
     userData?: userDataProps;
-    socket: WebSocket
+    socket: WebSocket;
+    infoModalOpen: boolean;
+    setInfoModalOpen: any;
 }
 
 export const Room = (props: RoomProps) => {
@@ -91,9 +94,10 @@ export const Room = (props: RoomProps) => {
 
     return (
         <>
+        <InfoModal room_id={props.room?._id} infoModalOpen={props.infoModalOpen} setInfoModalOpen={props.setInfoModalOpen}/>
             <div className="flex flex-col bg-neutral-900 h-screen">
-                <div className="fixed top-0 w-full z-10">
-                    <RoomNavbar room={props.room} />
+                <div className="fixed top-0 w-screen z-10">
+                    <RoomNavbar setInfoModalOpen={props.setInfoModalOpen} room={props.room} />
                 </div>
 
                 <div className="flex-1 overflow-y-auto pt-16 pb-24 px-4 

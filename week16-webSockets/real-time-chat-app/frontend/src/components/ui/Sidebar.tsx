@@ -9,6 +9,7 @@ interface SidebarProps{
     setCreateRoomModalOpen: any;
     setJoinRoomModalOpen: any;
     setSelectedRoom: (room: any) => void;
+    setInfoModalOpen: any;
     userData?: userDataProps;
     refresh:any;
 }
@@ -16,16 +17,12 @@ interface SidebarProps{
 export const Sidebar = (props: SidebarProps) => {
 
     return (
-        <div className={`fixed h-screen z-20 transition-all duration-300 ease-in-out
-    ${props.sidebarOpen 
+        <div className={`fixed flex flex-col h-screen z-20 transition-all duration-300 ease-in-out ${props.sidebarOpen 
         ? "w-[320px] left-0 shadow-xl md:shadow-none" 
         : "w-[70px] left-0 md:left-0"
-    }
-    dark:bg-neutral-800
-    scrollbar-thin
-    scrollbar-track-neutral-800 
-    scrollbar-thumb-neutral-600`}>
-
+    } dark:bg-neutral-800 scrollbar-thin scrollbar-track-neutral-800 scrollbar-thumb-neutral-600`}>
+        
+    <div className="top-0">
     {/* Mobile Menu Button (Always visible when closed) */}
     <div className={`absolute md:hidden ${props.sidebarOpen ? 'hidden' : 'block'} 
         left-5 top-6 text-white hover:-translate-y-1 transition-all
@@ -77,12 +74,15 @@ export const Sidebar = (props: SidebarProps) => {
             <X size={18}/>
         </div>
     </div>
+    </div>
     {/*Rooms*/}
+    <div className="flex-1 overflow-y-auto scrollbar-thin h-screen scrollbar-track-neutral-800 scrollbar-thumb-neutral-600">
     <div className="text-white my-4 mx-1 space-y-4">
         {props.userData?.rooms.length !== 0 ? props.userData?.rooms?.map((room) => (
             <div key={room._id} className="hover:bg-neutral-900 p-2 transition-colors duration-300"
                 onClick={(e) =>{
                     e.preventDefault();
+                    props.setInfoModalOpen(false);
                     props.setSelectedRoom(room);
                     props.refresh();
                 }}>
@@ -91,6 +91,7 @@ export const Sidebar = (props: SidebarProps) => {
             )) :
             <div className="text-white"> Create a room to start chatting </div>
         }
+    </div>
     </div>
 </div>
 

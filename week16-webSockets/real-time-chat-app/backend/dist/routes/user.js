@@ -149,6 +149,22 @@ userRouter.post("/join-room", middleware_1.userMiddleware, (req, res) => __await
         res.status(500).json({ message: "Server error", error: err });
     }
 }));
+userRouter.get("/info/:room_id", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const room_id = req.params.room_id;
+    try {
+        const room = yield db_1.RoomModel.findById({ _id: room_id }, {}).populate("users", "username profilePicture");
+        if (room) {
+            res.status(200).json({ roomDetails: room });
+        }
+        else {
+            res.status(204).json({ message: "Room not found!" });
+        }
+        console.log(room);
+    }
+    catch (err) {
+        res.status(500).json({ message: "Server error", error: err });
+    }
+}));
 userRouter.get("/home", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.username;
     const userId = req.userId;

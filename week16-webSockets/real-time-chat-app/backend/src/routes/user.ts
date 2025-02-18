@@ -169,6 +169,22 @@ userRouter.post("/join-room", userMiddleware , async(req , res) => {
     }
 });
 
+userRouter.get("/info/:room_id" , userMiddleware, async(req , res ) =>{
+    const room_id: string = req.params.room_id;
+
+    try{
+        const room = await RoomModel.findById({_id : room_id} , {}).populate("users" , "username profilePicture");
+        if(room){
+            res.status(200).json({roomDetails : room});
+        } else{
+            res.status(204).json({message:"Room not found!"});
+        }
+        console.log(room);
+    } catch(err){
+        res.status(500).json({message : "Server error" , error: err});
+    }
+})
+
 
 userRouter.get("/home" , userMiddleware, async (req , res) => {
     const username: string = req.username;

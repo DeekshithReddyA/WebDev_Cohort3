@@ -9,6 +9,7 @@ interface JoinRoomModalProps {
     joinRoomModalOpen: boolean;
     setJoinRoomModalOpen: any;
     refresh: any;
+    socket: WebSocket | null;
 }
 
 export const JoinRoomModal = (props: JoinRoomModalProps) => {
@@ -32,6 +33,10 @@ export const JoinRoomModal = (props: JoinRoomModalProps) => {
             });
             if (response.status === 200) {
                 props.refresh();
+                props.socket?.send(JSON.stringify({
+                    type: "join",
+                    payload: { token: localStorage.getItem('token') }
+                }));
                 setResponseMessage("Room Joined");
                 props.setJoinRoomModalOpen(false);
 

@@ -15,9 +15,10 @@ interface CreateRoomModalProps {
     createRoomModalOpen: boolean,
     setCreateRoomModalOpen: any;
     refresh: any;
+    socket: WebSocket | null;
 }
 export const CreateRoomModal = (props: CreateRoomModalProps) => {
-    const [link, setLink] = useState("");
+    const [link , setLink] = useState<string>("");
     const [copy, setCopy] = useState<boolean>(false);
     const [responseMessage, setResponseMessage] = useState("");
     const [roomCreated, setRoomCreated] = useState<boolean>(false);
@@ -68,8 +69,11 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
                 }
             });
             if (response.status === 200) {
-                console.log(response.data);
                 props.refresh();
+                props.socket?.send(JSON.stringify({
+                    type: "join",
+                    payload: { token: localStorage.getItem('token') }
+                }));
                 setRoomCreated(true);
                 setLink(response.data.link);
                 setResponseMessage("");

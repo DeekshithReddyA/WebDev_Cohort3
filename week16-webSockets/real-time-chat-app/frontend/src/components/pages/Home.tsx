@@ -32,6 +32,7 @@ export const Home = () => {
     const [createRoomModelOpen , setCreateRoomModalOpen ] = useState<boolean>(false);
     const [joinRoomModalOpen, setJoinRoomModalOpen] = useState<boolean>(false);
     const [selectedRoom , setSelectedRoom ] = useState<any>(null);
+    const [infoModalOpen , setInfoModalOpen] = useState<boolean>(false);
     const {refresh ,userData , messages }:{
       refresh: any,
       userData: any,
@@ -110,7 +111,7 @@ export const Home = () => {
         loading ? <Loading />
         :
         <div className="flex relative">
-            <Sidebar refresh={refresh} userData={userData} setSelectedRoom={setSelectedRoom} setJoinRoomModalOpen={setJoinRoomModalOpen} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} setCreateRoomModalOpen={setCreateRoomModalOpen}/>
+            <Sidebar setInfoModalOpen={setInfoModalOpen} refresh={refresh} userData={userData} setSelectedRoom={setSelectedRoom} setJoinRoomModalOpen={setJoinRoomModalOpen} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} setCreateRoomModalOpen={setCreateRoomModalOpen}/>
             <div className={`flex-1 transition-all duration-300 
                 ${isDesktop 
                   ? "ml-[320px]" 
@@ -118,10 +119,10 @@ export const Home = () => {
                   ? "ml-0" 
                   : "ml-[70px]"
                   }`}>
-                {selectedRoom ? <Room key={selectedRoom._id} socket={socketRef.current ? socketRef.current : new WebSocket(WS_URL)} userData={userData} messages={messages} room={selectedRoom}/> : <Landing />}
+                {selectedRoom ? <Room key={selectedRoom._id} setInfoModalOpen={setInfoModalOpen} infoModalOpen={infoModalOpen} socket={socketRef.current ? socketRef.current : new WebSocket(WS_URL)} userData={userData} messages={messages} room={selectedRoom}/> : <Landing />}
             </div>
-            <CreateRoomModal refresh={refresh} setCreateRoomModalOpen={setCreateRoomModalOpen} createRoomModalOpen={createRoomModelOpen}/>
-            <JoinRoomModal refresh={refresh} joinRoomModalOpen={joinRoomModalOpen} setJoinRoomModalOpen={setJoinRoomModalOpen} />
+            <CreateRoomModal socket={socketRef.current} refresh={refresh} setCreateRoomModalOpen={setCreateRoomModalOpen} createRoomModalOpen={createRoomModelOpen}/>
+            <JoinRoomModal socket={socketRef.current} refresh={refresh} joinRoomModalOpen={joinRoomModalOpen} setJoinRoomModalOpen={setJoinRoomModalOpen} />
         </div>
                 }
       </>
