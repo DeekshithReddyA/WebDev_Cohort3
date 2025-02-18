@@ -4,15 +4,20 @@ import { RoomNavbar } from "./RoomNavbar";
 import { userDataProps } from "../types/userData";
 import { useEffect, useRef, useState } from "react";
 import { InfoModal } from "./InfoModal";
+import MessageBubble from "./MessageBubble";
 interface Message {
-        _id: string;
-        text: string;
-        timestamp: string;
-        room_id: string;
-        sender: {
-            username?: string,
-            _id: string
-        };
+    _id: string;
+    text: string;
+    timestamp: string;
+    room_id: string;
+    sender: {
+        profilePicture:{
+            data: any,
+            contentType: any
+        }
+        username?: string,
+        _id: string
+    };
 }
 interface RoomProps {
     room?: {
@@ -32,25 +37,27 @@ interface RoomProps {
 }
 
 export const Room = (props: RoomProps) => {
-    const [roomMessages , setRoomMessages] = useState<Message[]>([]);
+    const [roomMessages, setRoomMessages] = useState<Message[]>([]);
     const [formData, setFormData] = useState({
         text: ""
     });
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // WebSocket handler with cleanup
-    useEffect(() =>{
+    useEffect(() => {
         const filtered_messages = props.messages?.filter((message) => {
-            return message.room_id === props.room?._id}
+            return message.room_id === props.room?._id
+        }
         );
-        if(filtered_messages !== undefined){
+        if (filtered_messages !== undefined) {
             setRoomMessages(filtered_messages);
         }
-    },[props.room?._id, props.messages]);
+    }, [props.room?._id, props.messages]);
 
     useEffect(() => {
         const messageHandler = (event: MessageEvent) => {
             const data = JSON.parse(event.data);
+            console.log(data);
             if (data.type === "chat" && data.room_id === props.room?._id) {
                 setRoomMessages(prev => [...prev, data]);
             }
@@ -69,12 +76,13 @@ export const Room = (props: RoomProps) => {
         e.preventDefault();
         if (!formData.text.trim()) return;
 
-        
+
         props.socket.send(JSON.stringify({
             type: "chat",
             payload: {
                 room_id: props.room?._id,
                 userId: props.userData?._id,
+                profilePicture : props.userData?.profilePicture,
                 msg: formData.text,
             }
         }));
@@ -92,9 +100,18 @@ export const Room = (props: RoomProps) => {
         });
     }
 
+    
+const dataToImageUrl = (profilePicture: { data: any, contentType: any }) => { 
+            const base64 = btoa(
+            new Uint8Array(profilePicture.data.data)
+            .reduce((data, byte) => data + String.fromCharCode(byte) , '')
+        );
+    return `data:${profilePicture.contentType};base64,${base64}`;
+}
+
     return (
         <>
-        <InfoModal room_id={props.room?._id} infoModalOpen={props.infoModalOpen} setInfoModalOpen={props.setInfoModalOpen}/>
+            <InfoModal room_id={props.room?._id} infoModalOpen={props.infoModalOpen} setInfoModalOpen={props.setInfoModalOpen} />
             <div className="flex flex-col bg-neutral-900 h-screen">
                 <div className="fixed top-0 w-screen z-10">
                     <RoomNavbar setInfoModalOpen={props.setInfoModalOpen} room={props.room} />
@@ -108,24 +125,38 @@ export const Room = (props: RoomProps) => {
                     <div className="flex flex-col space-y-4 mt-6">
                         <div className="flex flex-col space-y-4">
                             {roomMessages
-                        .sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-                        .map((message, index) => (
-                            <div key={`temp-${index}`} className={`flex ${
-                                message.sender._id === props.userData?._id ? 
-                                'items-end flex-col' : 'items-start'
-                            }`}>
-                                <div className={`max-w-64 p-3 rounded-lg break-words ${
-                                    message.sender._id === props.userData?._id ?
-                                    'bg-blue-600' : 'bg-neutral-800'
-                                } text-white`}>
-                                    {message.text}
-                                    <div className="text-xs mt-1 opacity-70">
-                                        {new Date(message.timestamp).toLocaleTimeString()}
+                                .sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+                                .map((message, index) => {
+                                    const url: string = dataToImageUrl(message.sender.profilePicture);
+                                    console.log("Control came till here");
+                                    return(
+                                    <div key={`temp-${index}`} className={`flex ${message.sender?._id === props.userData?._id ?
+                                            'items-end flex-col' : 'items-start'
+                                        }`}>
+                                        <div className="flex items-center">
+                                            {
+                                                message.sender?._id !== props.userData?._id && 
+                                                <img className="md:h-10 md:w-10 md:mr-2 mr-1 h-6 w-6 rounded-full" src={url} alt="User Profile"/>
+                                            }
+                                            {/* <div className={`max-w-64 p-3 rounded-lg break-words text-sm md:text-base ${message.sender._id === props.userData?._id ?
+                                                    'bg-blue-600' : 'bg-neutral-800'
+                                                } text-white`}>
+                                                    <div className="text-red-500 underline">{message.sender._id !== props.userData?._id && message.sender.username}</div>
+                                                {message.text}
+                                                <div className="text-[10px] mt-1 opacity-70">
+                                                    {new Date(message.timestamp).toLocaleTimeString([] , {hour : 'numeric' , minute:'2-digit'})}
+                                                </div>
+                                            </div> */}
+                                            <MessageBubble message={message} userData={props.userData} />
+                                           {
+                                                message.sender?._id === props.userData?._id && 
+                                                <img className="h-10 w-10 ml-1 rounded-full" src={url} alt="User Profile"/>
+                                            }
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        ))}
-                        <div ref={messagesEndRef} />
+                                    )
+                                })}
+                            <div ref={messagesEndRef} />
                         </div>
                     </div>
                 </div>
@@ -138,10 +169,10 @@ export const Room = (props: RoomProps) => {
                         </div>
 
                         <button type="submit">
-                        <div className="ml-4 mr-6 text-white">
-                            <SendHorizontal size={24} />
-                        </div>
-                            </button>
+                            <div className="ml-4 mr-6 text-white">
+                                <SendHorizontal size={24} />
+                            </div>
+                        </button>
 
                     </div>
                 </form>

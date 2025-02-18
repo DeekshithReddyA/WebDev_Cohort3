@@ -3,6 +3,10 @@ export interface userDataProps {
         username : string;
         createdAt ?: string,
         updatedAt ?: string;
+        profilePicture?: {
+            data: any,
+            contentType: any,
+        }
         rooms : {
             name : string,
             roomId : string,

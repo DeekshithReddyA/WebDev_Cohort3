@@ -55,11 +55,11 @@ export const CreateRoomModal = (props: CreateRoomModalProps) => {
         const submitData = new FormData();
         submitData.append("roomName", formData.roomName);
         if (files instanceof File) {
-            submitData.append("profilePicture", files);
+            submitData.append("roomPicture", files);
         } else {
             const response = await fetch(groupPP);
             const blob = await response.blob();
-            submitData.append("profilePicture", blob);
+            submitData.append("roomPicture", blob);
         }
         try {
             const response = await axios.post(`${BACKEND_URL}/create-room`, submitData, {

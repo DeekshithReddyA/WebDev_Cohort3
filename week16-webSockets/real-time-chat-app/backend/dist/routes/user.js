@@ -89,7 +89,7 @@ userRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
         res.status(500).json({ message: "Server Error", error: err });
     }
 }));
-userRouter.post("/create-room", middleware_1.userMiddleware, upload.single("profilePicture"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+userRouter.post("/create-room", middleware_1.userMiddleware, upload.single("roomPicture"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.username;
     const userIdInString = req.userId;
     const roomName = req.body.roomName;
@@ -168,7 +168,7 @@ userRouter.get("/info/:room_id", middleware_1.userMiddleware, (req, res) => __aw
 userRouter.get("/home", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.username;
     const userId = req.userId;
-    const userData = yield db_1.UserModel.find({ _id: userId, username }, { password: 0, email: 0, __v: 0, profilePicture: 0 }).populate("rooms");
+    const userData = yield db_1.UserModel.find({ _id: userId, username }, { password: 0, email: 0, __v: 0 }).populate("rooms");
     if (userData[0]) {
         const rooms = userData[0].rooms;
         const messages = yield db_1.MessageModel.find({ room_id: { "$in": rooms } })
@@ -177,7 +177,6 @@ userRouter.get("/home", middleware_1.userMiddleware, (req, res) => __awaiter(voi
             select: "username profilePicture"
         })
             .sort({ createdAt: 1 })
-            .lean()
             .catch((error) => res.status(400).json({ error }));
         res.status(200).json({ userData: userData[0], messages });
     }

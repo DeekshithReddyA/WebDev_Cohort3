@@ -77,13 +77,16 @@ wss.on("connection", async (socket) => {
             const username: string = parsedMessage.payload.username;
             const userId: string = parsedMessage.payload.userId;
             const msg: string = parsedMessage.payload.msg;
+            const profilePicture: {data: any , contentType: any} = parsedMessage.payload.profilePicture;
             
                 // Immediate broadcast
                 const messageToSend = {
                     _id: crypto.randomUUID() as string,
                     text: msg,
                     timestamp: new Date().toISOString(),
-                    sender: {username: username , _id: userId },
+                    sender: {username: username , 
+                            profilePicture,
+                            _id: userId },
                     room_id
             };
             console.log("Message To Send" + messageToSend)

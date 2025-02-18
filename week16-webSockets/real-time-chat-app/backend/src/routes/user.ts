@@ -103,7 +103,7 @@ userRouter.post("/signin" , async(req, res) => {
     }
 });
 
-userRouter.post("/create-room",  userMiddleware, upload.single("profilePicture") , async(req , res) => {
+userRouter.post("/create-room",  userMiddleware, upload.single("roomPicture") , async(req , res) => {
     const username: string = req.username
     const userIdInString: string = req.userId;
     const roomName: string = req.body.roomName;
@@ -190,7 +190,7 @@ userRouter.get("/home" , userMiddleware, async (req , res) => {
     const username: string = req.username;
     const userId: string = req.userId;
 
-    const userData = await UserModel.find({_id : userId , username} , {password: 0, email : 0 , __v : 0 , profilePicture : 0}).populate("rooms");
+    const userData = await UserModel.find({_id : userId , username} , {password: 0, email : 0 , __v : 0}).populate("rooms");
     if(userData[0]){
         const rooms = userData[0].rooms;
         const messages = await MessageModel.find({room_id : { "$in" : rooms}})
@@ -199,7 +199,6 @@ userRouter.get("/home" , userMiddleware, async (req , res) => {
                                                 select : "username profilePicture"
                                             })
                                             .sort({createdAt: 1})
-                                            .lean()
                                             .catch((error) => res.status(400).json({error}));
         res.status(200).json({userData : userData[0] , messages  });
     } else {
