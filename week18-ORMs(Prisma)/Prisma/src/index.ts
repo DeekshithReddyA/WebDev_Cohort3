@@ -68,6 +68,7 @@ const createUser = async () => {
             todos : true
         }
     });
+    
 };
 
 createUser();
