@@ -1,10 +1,13 @@
 "use client"
 
 import axios from "axios"
-import { fromJSON } from "postcss";
+import { useRouter } from "next/navigation";
 import { useState } from "react"
 
+
+
 export default function Signup() {
+    const router = useRouter();
         const [formData , setFormData] = useState({
         username : "",
         password : ""
@@ -26,7 +29,8 @@ export default function Signup() {
                 axios.post("http://localhost:3000/api/v1/signup" , {
                     username : formData.username,
                     password: formData.password
-                })
+                });
+                router.push('/signin')
             }}
             >Sign up </button>
         </div>
