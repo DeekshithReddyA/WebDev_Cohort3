@@ -1,0 +1,3 @@
+Excalidraw project in a different repo...
+Will be shifting the chatbuds(real-time-chat-app) and second brain projects too to different repos. 
+
